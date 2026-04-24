@@ -1,0 +1,17 @@
+services:
+  gizmosql:
+    image: gizmodata/gizmosql:v1.21.3-slim
+    init: true
+    user: "${UID}:${GID}"
+    env_file:
+      - .env
+    ports:
+      - 31337:31337
+    volumes:
+      #- gizmosql_data:/opt/gizmosql/data
+      - ./init.sql:/home/app_user/init.sql
+    restart: unless-stopped
+
+
+# volumes:
+#   gizmosql_data:

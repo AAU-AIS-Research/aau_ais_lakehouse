@@ -1,0 +1,22 @@
+{
+    "folders": [
+        {
+            "name": "Trajectory",
+            "path": "../packages/traj"
+        },
+        {
+            "name": "Root",
+            "path": ".."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "packages/": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "qufiwefefwoyn.inline-sql-syntax"
+        ]
+    }
+}
