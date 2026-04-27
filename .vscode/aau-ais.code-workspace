@@ -1,6 +1,14 @@
 {
     "folders": [
         {
+            "name": "CLI",
+            "path": "../packages/cli"
+        },
+        {
+            "name": "Schema",
+            "path": "../packages/schema"
+        },
+        {
             "name": "Trajectory",
             "path": "../packages/traj"
         },

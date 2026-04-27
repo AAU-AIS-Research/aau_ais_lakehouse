@@ -1,0 +1,24 @@
+services:
+  gizmosql:
+    image: gizmodata/gizmosql:v1.21.3-slim
+    container_name: "aau_ais_gizmosql"
+    init: true
+    user: "${UID}:${GID}"
+    env_file:
+      - .env
+    ports:
+      - 31337:31337
+    volumes:
+      - gizmosql_data:/opt/gizmosql/data
+      - ./init.sql:/home/app_user/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/localhost/31338' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+
+volumes:
+  gizmosql_data:

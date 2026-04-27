@@ -1,26 +1,23 @@
 [project]
-name = "aau-ais-traj"
+name = "aau-ais-schema"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk" }]
 requires-python = ">=3.13"
 dependencies = [
-    "adbc-driver-gizmosql==1.1.*",
-    "jinja2==3.*",
-    "aau-ais-schema",
+    "adbc-driver-manager==1.11.*",
+    "duckdb==1.5.*",
+    "loguru==0.7.*",
+    "pyarrow>=23"
 ]
-
-[tool.uv.sources]
-aau-ais-schema = { path = '../schema', editable = true }
 
 [dependency-groups]
 dev = ["pyarrow-stubs==20.0.*"]
 
-
 [project.scripts]
-lakehouse = "aau_traj.main:app"
+schema = "schema:main"
 
 [build-system]
-requires = ["uv_build>=0.11.6,<0.12.0"]
+requires = ["uv_build>=0.11.7,<0.12.0"]
 build-backend = "uv_build"
