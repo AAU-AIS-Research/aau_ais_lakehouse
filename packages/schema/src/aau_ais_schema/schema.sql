@@ -4,8 +4,6 @@
 create schema if not exists dim;
 create schema if not exists lakehouse.fact;
 
-use ais.dim;
-
 -- Load dimension
 create table if not exists dim.load_dim(
     load_id         uinteger        primary key,

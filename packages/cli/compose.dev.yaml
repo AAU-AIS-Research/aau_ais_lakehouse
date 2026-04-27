@@ -4,9 +4,9 @@ services:
     container_name: "aau_ais_gizmosql"
     init: true
     user: "${UID}:${GID}"
-    env_file:
-      - .env
     environment:
+      - GIZMOSQL_USERNAME=$GIZMOSQL__USER
+      - GIZMOSQL_PASSWORD=$GIZMOSQL__PASSWORD
       - DATABASE_FILENAME=/opt/gizmosql/data/ais.duckdb
       - TLS_ENABLED=0
       - PRINT_QUERIES=1

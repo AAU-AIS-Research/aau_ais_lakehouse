@@ -27,6 +27,7 @@ def start():
     try:
         subprocess.run(
             cmd,
+            # env=env,
             capture_output=True,
             check=True,
             text=True,
