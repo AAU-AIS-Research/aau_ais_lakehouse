@@ -12,7 +12,7 @@ services:
       - PRINT_QUERIES=1
       - INIT_SQL_COMMANDS_FILE=/home/app_user/init.sql
     ports:
-      - 31337:31337
+      - 127.0.0.1:31337:31337
     volumes:
       - gizmosql_data:/opt/gizmosql/data
       - ./init.sql:/home/app_user/init.sql

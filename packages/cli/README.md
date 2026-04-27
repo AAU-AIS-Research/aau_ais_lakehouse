@@ -21,4 +21,6 @@ If using uv you can run the following command to start the gizmosql service: `uv
 - For loading a directory of parquet files - `uv run aauais load-dir /path/to/data` 
 - For loading a single parquet file - `uv run aauais load /path/to/data.pq`
 
+When the development stack should be shut down the `uv run aauais dev stop` should be called. Data is persisted in a named docker volume called `gizmosql_data`, and will therefore be available again.
+
 If `uv` is not used, the cli package should be installed where the `aauais` cli should be available.
