@@ -6,6 +6,11 @@ services:
     user: "${UID}:${GID}"
     env_file:
       - .env
+    environment:
+      - DATABASE_FILENAME=/opt/gizmosql/data/ais.duckdb
+      - TLS_ENABLED=0
+      - PRINT_QUERIES=1
+      - INIT_SQL_COMMANDS_FILE=/home/app_user/init.sql
     ports:
       - 31337:31337
     volumes:

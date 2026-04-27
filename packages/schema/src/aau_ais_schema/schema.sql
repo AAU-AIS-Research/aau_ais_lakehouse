@@ -4,7 +4,7 @@
 create schema if not exists dim;
 create schema if not exists lakehouse.fact;
 
-set search_path = 'ais.dim,lakehouse.fact';
+use ais.dim;
 
 -- Load dimension
 create table if not exists dim.load_dim(

@@ -1,5 +1,10 @@
 # README
 
+## Prerequisites
+### Required
+- Docker
+### Recommended
+- uv
 
 ## Environment
 ```bash
@@ -9,9 +14,4 @@ GIZMOSQL__USER=${GIZMOSQL_USERNAME}
 GIZMOSQL__PASSWORD=${GIZMOSQL_PASSWORD}
 GIZMOSQL__HOST=localhost
 GIZMOSQL__PORT=31337
-
-DATABASE_FILENAME=/opt/gizmosql/ais.duckdb
-TLS_ENABLED=0
-PRINT_QUERIES=1
-INIT_SQL_COMMANDS_FILE=/home/app_user/init.sql
 ```
