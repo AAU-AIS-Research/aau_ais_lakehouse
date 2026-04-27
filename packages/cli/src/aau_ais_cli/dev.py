@@ -31,6 +31,7 @@ def start():
             check=True,
             text=True,
         )
+        # TODO: Implement prober health check instead of sleep
         time.sleep(3)
     except subprocess.CalledProcessError as e:
         print("--- DOCKER ERROR ---")
