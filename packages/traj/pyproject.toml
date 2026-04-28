@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk" }]
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "adbc-driver-gizmosql==1.1.*",
     "jinja2==3.*",
