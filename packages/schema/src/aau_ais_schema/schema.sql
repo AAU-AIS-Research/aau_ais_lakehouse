@@ -1,9 +1,13 @@
 --------------------------------------------------------------------------------------
--- Schema
+--#region Schema
 --------------------------------------------------------------------------------------
 create schema if not exists dim;
 create schema if not exists lakehouse.fact;
-
+--#endregion
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+--#region Dimensions
+--------------------------------------------------------------------------------------
 -- Load dimension
 create table if not exists dim.load_dim(
     load_id         uinteger        primary key,
@@ -93,6 +97,27 @@ create table if not exists dim.vessel_config_dim(
     unique (length, width, height, max_draught, dwt, grt, to_bow, to_stern, to_port, to_starboard, main_engine_kwh, aux_engine_kwh)
 );
 
+-- Depth cell dimension
+create sequence if not exists dim.depth_grid_dim_depth_cell_id_seq;
+create table if not exists dim.depth_grid_dim(
+    depth_cell_id   ubigint     primary key default nextval('dim.depth_grid_dim_depth_cell_id_seq'),
+    x               uinteger    not null,
+    y               uinteger    not null,
+    depth           float       not null check (depth >= 0),
+    partly_land     boolean     default null,
+    derived_value   boolean     default null,
+    geom            geometry    not null,
+    unique (x, y)
+);
+comment on column dim.depth_grid_dim.depth is 'Depth in meters';
+comment on column dim.depth_grid_dim.geom is 'SRID is 3034';
+
+-- Half-degree grid dimension
+create sequence if not exists dim.half_degree_grid_dim_half_degree_cell_id_seq;
+create table if not exists dim.half_degree_grid_dim(
+    half_degree_cell_id uinteger    primary key default nextval('dim.half_degree_grid_dim_half_degree_cell_id_seq'),
+    gst_cell_id         varchar(5)
+);
 
 -- Transponder type dimension
 create sequence if not exists dim.transponder_type_dim_transponder_type_id_seq;
@@ -118,33 +143,41 @@ create table if not exists dim.vessel_name_dim(
 );
 insert or ignore into dim.vessel_name_dim(vessel_name) values ('unknown');
 
+-- Vessel positioning type dimension
 create sequence if not exists dim.pos_type_dim_pos_type_id_seq;
 create table if not exists dim.pos_type_dim(
     pos_type_id usmallint       primary key default nextval('dim.pos_type_dim_pos_type_id_seq'),
     pos_type    varchar(250)    not null unique
 );
 
+-- Vessel cargo type dimension
 create sequence if not exists dim.cargo_type_dim_cargo_type_id_seq;
 create table if not exists dim.cargo_type_dim(
     cargo_type_id   usmallint   primary key default nextval('dim.cargo_type_dim_cargo_type_id_seq'),
     cargo_type      varchar(50) not null unique
 );
 
+-- Vessel call-sign dimension
 create sequence if not exists dim.call_sign_dim_call_sign_id_seq;
 create table if not exists dim.call_sign_dim(
     call_sign_id    uinteger        primary key default nextval('dim.call_sign_dim_call_sign_id_seq'),
     call_sign       varchar(250)    not null unique
 );
 
+-- Vessel destination dimension
 create sequence if not exists dim.destination_dim_destination_id_seq;
 create table if not exists dim.destination_dim(
     destination_id  uinteger    primary key default nextval('dim.destination_dim_destination_id_seq'),
     org_msg         text        unique          not null
 );
 
---------------------------------------------------------------------------------------
--- Trajectory
---------------------------------------------------------------------------------------
+-- Navigation status dimension
+create sequence if not exists dim.nav_status_dim_nav_status_id_seq;
+create table if not exists dim.nav_status_dim(
+    nav_status_id   usmallint       primary key default nextval('dim.nav_status_dim_nav_status_id_seq'),
+    nav_status      varchar(250)    not null unique
+);
+
 -- The categories of sub-parts of an AIS sequence from a vessel
 create sequence if not exists dim.traj_type_dim_traj_type_id_seq;
 create table if not exists dim.traj_type_dim(
@@ -188,7 +221,75 @@ create table if not exists dim.traj_geom_dim(
     check (ST_GeometryType(geom) = 'LINESTRING')
 );
 
+-- Where the linestrings stops are stored
+create sequence if not exists dim.stop_geom_dim_geom_id_seq;
+create table if not exists dim.stop_geom_dim(
+    geom_id                 uinteger    primary key default nextval('dim.stop_geom_dim_geom_id_seq'),
+    geom                    geometry    not null,
+    start_point             geometry    not null,   -- ST_PointN(geom, 1)    
+    end_point               geometry    not null,   -- ST_PointN(geom, length(geom))    
+    is_simple_geom          boolean     not null,   -- ST_IsSimple(geom)
+    is_valid_geom           boolean     not null,   -- ST_IsValid(geom)    
+    centroid                geometry    not null,   -- Centroid = ST_Centroid(geom)
+    simplified_geom         geometry    not null,   -- ST_ConvexHull(geom) 
+    simplified_geom_topo    geometry    not null,   -- ST_SimplifyPreserveTopology(geom)
+    check (ST_GeometryType(geom) = 'LINESTRING')
+);
 
+--#endregion
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+--#region Facts
+--------------------------------------------------------------------------------------
+
+-- AIS point fact
+create table if not exists lakehouse.fact.ais_point_fact(
+    ais_point_id        ubigint     not null,
+    prev_ais_point_id   ubigint,
+    temporal_part_key   uinteger    not null,
+    spatial_part_key    uinteger    not null,
+    qkey                ubigint     not null,
+    alpha2              char(2)     not null,
+    load_id             uinteger    not null,
+    date_id             uinteger    not null,
+    time_id             uinteger    not null,
+    call_sign_id        uinteger    not null,
+    cargo_type_id       usmallint   not null,
+    depth_cell_id       ubigint     not null,
+    destination_id      uinteger    not null,
+    half_degree_cell_id uinteger    not null,
+    nav_status_id       usmallint   not null,
+    pos_type_id         usmallint   not null,
+    transponder_type_id usmallint   not null,
+    vessel_id           uinteger    not null,
+    vessel_config_id    uinteger    not null,
+    vessel_type_id      usmallint   not null,
+    vessel_name_id      uinteger    not null,
+    ts                  timestamp   not null,
+    lon                 float       not null,
+    lat                 float       not null,
+    rot                 numeric(10, 1),
+    sog                 numeric(10, 1),
+    cog                 numeric(10, 1),
+    heading             numeric(10, 1),
+    draught             numeric(10, 1),
+    depth               float,
+    eta                 timestamp,
+    ukc                 float,
+    delta_pos           float,
+    delta_sec           float,
+    delta_sog           numeric(10,1),
+    delta_rot           numeric(10,1),
+    delta_cog           numeric(10,1),
+    delta_heading       numeric(10,1),
+    delta_cog_heading   numeric(10,1),
+    delta_draught       numeric(10,1),
+    delta_destination   boolean
+);
+
+alter table lakehouse.fact.ais_point_fact set partitioned by (spatial_part_key, temporal_part_key);
+
+-- AIS trajectory fact
 create table if not exists lakehouse.fact.ais_traj_fact(
     ais_traj_id             uinteger        not null,
     load_id                 uinteger        not null,
@@ -241,33 +342,12 @@ create table if not exists lakehouse.fact.ais_traj_fact(
     dist_meter_prev_obj     uinteger,
     dist_sec_prev_obj       uinteger
 );
-
-
 comment on column lakehouse.fact.ais_traj_fact.dist_meter_prev_obj is
     'distance in seconds to the previous object for the vessel, think imputation';
 comment on column lakehouse.fact.ais_traj_fact.dist_sec_prev_obj is
     'distance in seconds to the previous object for the vessel, think imputation';
 
---------------------------------------------------------------------------------------
--- Stops
---------------------------------------------------------------------------------------
-
--- Where the linestrings stops are stored
-create sequence if not exists dim.stop_geom_dim_geom_id_seq;
-create table if not exists dim.stop_geom_dim(
-    geom_id                 uinteger    primary key default nextval('dim.stop_geom_dim_geom_id_seq'),
-    geom                    geometry    not null,
-    start_point             geometry    not null,   -- ST_PointN(geom, 1)    
-    end_point               geometry    not null,   -- ST_PointN(geom, length(geom))    
-    is_simple_geom          boolean     not null,   -- ST_IsSimple(geom)
-    is_valid_geom           boolean     not null,   -- ST_IsValid(geom)    
-    centroid                geometry    not null,   -- Centroid = ST_Centroid(geom)
-    simplified_geom         geometry    not null,   -- ST_ConvexHull(geom) 
-    simplified_geom_topo    geometry    not null,   -- ST_SimplifyPreserveTopology(geom)
-    check (ST_GeometryType(geom) = 'LINESTRING')
-);
-
-
+-- AIS stop fact
 create table if not exists lakehouse.fact.ais_stop_fact(
     ais_stop_id             uinteger        not null,
     load_id                 uinteger        not null,
@@ -320,3 +400,5 @@ create table if not exists lakehouse.fact.ais_stop_fact(
     dist_meter_prev_obj     uinteger,
     dist_sec_prev_obj       uinteger
 );
+--#endregion
+--------------------------------------------------------------------------------------
