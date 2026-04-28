@@ -5,6 +5,201 @@ create schema if not exists dim;
 create schema if not exists lakehouse.fact;
 --#endregion
 --------------------------------------------------------------------------------------
+--#region Macros
+--------------------------------------------------------------------------------------
+create or replace macro minutes_since_midnight(ts) as
+    hour(ts::timestamp) * 60 + minute(ts::timestamp);
+
+create or replace macro quadkey_bit_encode(qkey) as (
+    with expanded as (
+        select unnest(string_split(qkey, '')) as digit
+    ), mapped as (
+        select case digit
+            when '0' then '00'
+            when '1' then '01'
+            when '2' then '10'
+            when '3' then '11'
+            end as bits
+        from expanded
+    )
+    select string_agg(bits, '')::bit as qkey
+    from mapped
+);
+
+create or replace macro quadkey_uint16_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::usmallint as qkey
+);
+
+create or replace macro quadkey_uint32_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::uinteger as qkey
+);
+
+create or replace macro quadkey_uint64_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::ubigint as qkey
+);
+
+create or replace macro quadkey_int16_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::int16 as qkey
+);
+
+create or replace macro quadkey_int32_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::int32 as qkey
+);
+
+create or replace macro quadkey_int64_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::int64 as qkey
+);
+
+create or replace macro quadkey_to_zxy(qkey) as table (
+    with recursive
+    digits(qkey) as (
+        select
+            qkey,
+            length(qkey)::int           as z,
+            pos + 1                     as pos,
+            substring(qkey, pos + 1, 1) as digit
+        from range(length(qkey))        as t(pos)
+    ),
+    recur(pos, digit, z, x, y) as (
+        -- base case
+        select 0, null, (select z from digits limit 1), 0::int, 0::int
+        union all
+        -- recursive step
+        select
+            d.pos,
+            d.digit,
+            r.z,
+            r.x * 2 + case d.digit when '1' then 1 when '3' then 1 else 0 end,
+            r.y * 2 + case d.digit when '2' then 1 when '3' then 1 else 0 end
+        from recur r
+        join digits d on d.pos = r.pos + 1
+    )
+    select
+        z,
+        x,
+        y
+    from recur
+    where pos = z
+);
+
+create or replace macro int_to_quadkey(val, z) as (
+    with input as (
+        select right(val::bit::varchar, z * 2) as bitstring
+    )
+    select string_agg(digit, '' order by pos) as quadkey
+    from (
+    select
+        case substr(bitstring, pos, 2)
+        when '00' then '0' when '01' then '1' when '10' then '2' when '11' then '3'
+        end as digit,
+        pos
+    from input, generate_series(1, length(bitstring), 2) as gs(pos)
+    order by pos
+    ) t
+);
+
+create or replace macro coord_to_quadrant(lon, lat) as (
+    select case
+        when lon >= 0 and lat >= 0 then 1
+        when lon < 0 and lat >= 0 then 2
+        when lon < 0 and lat < 0 then 3
+        when lon >=0 and lat < 0 then 4
+    end     
+);
+
+create or replace macro coord_to_grid_id(x, y, x_min, y_min, x_max, y_max, cell_width, cell_height) AS (
+    with variables as (
+        select floor((x_max - x_min) / cell_width)  as col_cnt,
+               floor((y_max - y_min) / cell_height) as row_cnt,
+               floor((x - x_min) / cell_width)      as i,
+               floor((y - y_min) / cell_height)     as j
+    )
+    select
+        case
+            when 0 > i or i >= col_cnt or 0 > j or j >= row_cnt or isinf(x) or isinf(y) then -1
+            else (col_cnt * j + i)::bigint
+        end as grid_id
+    from variables
+);
+
+create or replace macro wgs84_coord_to_grid_id(lon, lat, cell_width, cell_height) as (
+    with wgs84_convert as (
+        select if(lon = 180, -180, lon) + 180   as lon_360,
+               lat + 90                         as lat_180,
+    ), variable as (
+        select lon_360,
+               lat_180,
+               coord_to_quadrant(lon_360 - 180, lat_180 - 90)   as quadrant,
+               if(lon_360 < 180, 0, 180)                        as x_min,
+               if(lat_180 < 90, 0, 90)                          as y_min,
+               if(lon_360 < 180, 180, 360)                      as x_max,
+               if(lat_180 < 90, 90, 180)                        as y_max
+        from wgs84_convert
+    ), result as (
+        select
+            quadrant,
+            coord_to_grid_id(
+                lon_360,
+                lat_180,
+                x_min,
+                y_min,
+                x_max,
+                y_max,
+                cell_width,
+                cell_height
+            ) as grid_id
+        from variable
+    )
+    select if(grid_id = -1, -1, grid_id + quadrant * 100000)
+    from result
+);
+
+create or replace macro grid_id_to_coord(id, x_min, y_min, x_max, y_max, cell_width, cell_height) as (
+    with variable as (
+        select
+            floor((x_max - x_min) / cell_width)   as col_cnt,
+            floor((y_max - y_min) / cell_height)  as row_cnt
+    )
+    select
+        case
+            when id between 0 and (col_cnt * row_cnt) - 1 then
+                {'x': id % col_cnt * cell_width + x_min, 'y': floor(id / col_cnt) * cell_height + y_min}
+            else {'x': null, 'y': null}
+        end
+    from variable
+);
+
+create or replace macro grid_id_to_wgs84_coord(grid_id, cell_width, cell_height) as (
+    with variable as (
+        select
+            floor(grid_id / 100000) as quadrant,
+            grid_id % 100000        as v_grid_id
+    ), to_coord as (
+        select 
+            case
+                when quadrant = 1 then
+                    grid_id_to_coord(v_grid_id, 180, 90, 360, 180, cell_width, cell_height)
+                when quadrant = 2 then
+                    grid_id_to_coord(v_grid_id, 0, 90, 180, 180, cell_width, cell_height)
+                when quadrant = 3 then
+                    grid_id_to_coord(v_grid_id, 0, 0, 180, 90, cell_width, cell_height)
+                when quadrant = 4 then
+                    grid_id_to_coord(v_grid_id, 180, 0, 360, 90, cell_width, cell_height)
+            end as coord
+        from variable
+    )
+    select {'x': coord.x - 180, 'y': coord.y - 90}
+    from to_coord
+);
+
+create or replace macro grid_id_to_wgs84_envelope(grid_id, cell_width, cell_height) as (
+    with variable as (
+        select grid_id_to_wgs84_coord(grid_id, cell_width, cell_height) as coord
+    )
+    select ST_MakeEnvelope(coord.x, coord.y, coord.x + cell_width, coord.y + cell_height)
+    from variable
+);
+--#endregion
 --------------------------------------------------------------------------------------
 --#region Dimensions
 --------------------------------------------------------------------------------------
@@ -237,7 +432,6 @@ create table if not exists dim.stop_geom_dim(
 );
 
 --#endregion
---------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 --#region Facts
 --------------------------------------------------------------------------------------
