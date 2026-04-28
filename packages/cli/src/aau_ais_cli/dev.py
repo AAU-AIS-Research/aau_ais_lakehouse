@@ -4,23 +4,22 @@ import time
 from pathlib import Path
 from typing import Annotated
 
-import typer
 from rich import print
-from typer import Option
+from typer import Option, Typer
 
 from aau_ais_cli import db
 
-typer = typer.Typer()
+cli = Typer()
 
 COMPOSE_FILE = Path(__file__).parents[2] / "compose.dev.yaml"
 
 
-@typer.command()
+@cli.command()
 def start(
     public: Annotated[
         bool,
         Option(
-            help="Use this flag if the database should be visible on the host network",
+            help="Use this flag if the database should hosted on 0.0.0.0 instead of localhost",
         ),
     ] = False,
 ):
@@ -46,7 +45,7 @@ def start(
     db.create()
 
 
-@typer.command()
+@cli.command()
 def stop():
     """Stop the development docker stack"""
     cmd = ["docker", "compose", "-f", COMPOSE_FILE, "down"]

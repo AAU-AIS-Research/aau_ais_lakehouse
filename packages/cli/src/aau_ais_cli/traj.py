@@ -13,7 +13,7 @@ from aau_ais_cli.settings import Settings
 
 LoadFunc = Callable[[str, Connection, Table], None]
 
-typer = Typer()
+cli = Typer()
 
 
 def __load(
@@ -33,7 +33,7 @@ def __load(
             print(f"[green]Data loaded into {dst_tbl} successfully.[/green]")
 
 
-@typer.command()
+@cli.command()
 def load(
     trajectory_file: Annotated[
         Path, Argument(..., help="Path to the parquet file containing trajectory data.")
@@ -58,7 +58,7 @@ def load(
         )
 
 
-@typer.command()
+@cli.command()
 def load_dir(
     dir: Annotated[
         Path, Argument(..., help="Path to the directory containing trajectory data.")
