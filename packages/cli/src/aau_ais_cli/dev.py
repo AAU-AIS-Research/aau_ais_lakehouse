@@ -1,11 +1,14 @@
+import os
 import subprocess
 import time
 from importlib import resources
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from adbc_driver_gizmosql import dbapi
 from rich import print
+from typer import Option
 
 from aau_ais_cli.settings import Settings
 
@@ -19,11 +22,19 @@ def get_settings():
 
 
 @typer.command()
-def start():
+def start(
+    public: Annotated[
+        bool,
+        Option(
+            help="Use this flag if the database should be visible on the host network",
+        ),
+    ] = False,
+):
     """Start the development docker stack"""
     cmd = ["docker", "compose", "-f", COMPOSE_FILE.as_posix(), "up", "-d"]
     print("Starting services...")
-
+    if public:
+        os.environ["GIZMOSQL_IP"] = "0.0.0.0"
     try:
         subprocess.run(
             cmd,
