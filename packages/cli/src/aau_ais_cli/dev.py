@@ -1,24 +1,18 @@
 import os
 import subprocess
 import time
-from importlib import resources
 from pathlib import Path
 from typing import Annotated
 
 import typer
-from adbc_driver_gizmosql import dbapi
 from rich import print
 from typer import Option
 
-from aau_ais_cli.settings import Settings
+from aau_ais_cli import db
 
 typer = typer.Typer()
 
 COMPOSE_FILE = Path(__file__).parents[2] / "compose.dev.yaml"
-
-
-def get_settings():
-    return Settings()  # type: ignore
 
 
 @typer.command()
@@ -49,17 +43,7 @@ def start(
         print("--- DOCKER ERROR ---")
         print(e.stderr)  # This contains the actual reason Docker failed
         print("--------------------")
-
-    settings = get_settings()
-    with dbapi.connect(
-        settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs
-    ) as con:
-        q = resources.files("aau_ais_schema").joinpath("schema.sql").read_text()
-
-        print("Executing SQL query to create lakehouse schema...")
-        with con.cursor() as cur:
-            cur.execute(q)
-    print("[green]Lakehouse schema initialized successfully.[/green]")
+    db.create()
 
 
 @typer.command()

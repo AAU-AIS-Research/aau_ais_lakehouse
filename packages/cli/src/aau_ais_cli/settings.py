@@ -1,3 +1,5 @@
+from functools import cache
+
 from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -45,3 +47,8 @@ class Settings(BaseSettings):
         case_sensitive=False,
         env_nested_delimiter="__",
     )
+
+    @staticmethod
+    @cache
+    def create() -> "Settings":
+        return Settings()  # type: ignore
