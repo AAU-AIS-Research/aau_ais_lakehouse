@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Annotated, Callable
 
-from aau_ais_traj import __load_stop_fact, __load_traj_fact, utils
+from aau_ais_traj import load_stop_fact, load_traj_fact, utils
 from aau_ais_traj.load_context import LoadContext
 from adbc_driver_gizmosql import dbapi
 from adbc_driver_gizmosql.dbapi import Connection
@@ -51,10 +51,10 @@ def load(
         ) as con,
     ):
         __load(
-            trajectory_file, "lakehouse.fact.ais_traj_fact", con, __load_traj_fact.load
+            trajectory_file, "lakehouse.fact.ais_traj_fact", con, load_traj_fact.load
         )
         __load(
-            trajectory_file, "lakehouse.fact.ais_stop_fact", con, __load_stop_fact.load
+            trajectory_file, "lakehouse.fact.ais_stop_fact", con, load_stop_fact.load
         )
 
 
