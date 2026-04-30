@@ -1,3 +1,4 @@
+from functools import cache
 from urllib import parse
 
 from pydantic import BaseModel, SecretStr, computed_field
@@ -50,7 +51,13 @@ class Settings(BaseSettings):
     # files in '/run/secrets' take priority over '/var/run'
     model_config = SettingsConfigDict(
         secrets_dir=("/var/run", "/run/secrets"),
+        extra="ignore",
+        env_file=".env",
         case_sensitive=False,
-        env_prefix="ukc_",
         env_nested_delimiter="__",
     )
+
+    @classmethod
+    @cache
+    def create(cls):
+        return cls()  # type: ignore
