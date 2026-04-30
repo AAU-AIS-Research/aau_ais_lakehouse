@@ -1,9 +1,9 @@
 import time
 
-from adbc_driver_flightsql.dbapi import Connection
+from adbc_driver_manager.dbapi import Connection
 from loguru import logger
 
-from aau_ais_traj.exceptions import LoadError
+from aau_ais_schema.exceptions import LoadError
 
 
 class _LoadContext:
@@ -87,7 +87,6 @@ select exists (
     def __register(self) -> int:
         q = """--sql
 insert into dim.load_dim (
-    load_id,
 	src_id,
     dst_tbl,
 	start_ts,
@@ -102,7 +101,6 @@ insert into dim.load_dim (
     ingest_per_sec
 )
 values (
-    (select coalesce(max(load_id), 0) + 1 from dim.load_dim),
     ?,
     ?,
     to_timestamp(?),

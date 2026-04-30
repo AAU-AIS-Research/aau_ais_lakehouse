@@ -1,11 +1,11 @@
 import duckdb
+from aau_ais_schema import LoadContext
 from aau_ais_schema.dim import traj_geom_dim
 from adbc_driver_gizmosql.dbapi import Connection
 from duckdb import ConstantExpression
 from pyarrow import Table
 
 from aau_ais_traj import JINJA_ENV, __load_common, utils
-from aau_ais_traj.load_context import LoadContext
 
 
 def join_traj_geom_ids(src: Table, dst_con: Connection) -> Table:

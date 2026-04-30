@@ -13,6 +13,7 @@ dependencies = [
 
 [tool.uv.sources]
 aau-ais-schema = { path = '../schema', editable = true }
+aau-ais-core = { path = '../core', editable = true }
 
 [dependency-groups]
 dev = ["pyarrow-stubs==20.0.*"]

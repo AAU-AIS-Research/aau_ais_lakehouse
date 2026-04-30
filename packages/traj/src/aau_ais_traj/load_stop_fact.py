@@ -1,11 +1,11 @@
 import duckdb
+from aau_ais_schema import LoadContext
 from aau_ais_schema.dim import stop_geom_dim
 from adbc_driver_gizmosql.dbapi import Connection
 from duckdb import ColumnExpression, ConstantExpression, FunctionExpression
 from pyarrow import Table
 
 from aau_ais_traj import JINJA_ENV, __load_common, utils
-from aau_ais_traj.load_context import LoadContext
 
 
 def join_stop_geom_ids(src: Table, dst_con: Connection) -> Table:

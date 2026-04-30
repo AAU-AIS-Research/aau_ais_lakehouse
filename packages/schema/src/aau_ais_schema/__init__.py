@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from schema!")
+from aau_ais_schema.load_context import LoadContext

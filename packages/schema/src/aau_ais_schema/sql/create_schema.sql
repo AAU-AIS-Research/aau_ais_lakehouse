@@ -206,8 +206,9 @@ create or replace macro grid_id_to_wgs84_envelope(grid_id, cell_width, cell_heig
 --#region Dimensions
 --------------------------------------------------------------------------------------
 -- Load dimension
+create sequence if not exists dim.load_dim_load_id_seq;
 create table if not exists dim.load_dim(
-    load_id         uinteger        primary key,
+    load_id         uinteger        primary key default nextval('dim.load_dim_load_id_seq'),
     src_id          varchar(100)    not null,
     dst_tbl         varchar(100)    not null,
     start_ts        timestamp       not null,

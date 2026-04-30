@@ -5,6 +5,10 @@
             "path": "../packages/cli"
         },
         {
+            "name": "Core",
+            "path": "../packages/core"
+        },
+        {
             "name": "Schema",
             "path": "../packages/schema"
         },

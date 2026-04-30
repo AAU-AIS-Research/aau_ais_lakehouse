@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Annotated, Callable
 
+from aau_ais_schema import LoadContext
 from aau_ais_traj import load_stop_fact, load_traj_fact, utils
-from aau_ais_traj.load_context import LoadContext
 from adbc_driver_gizmosql import dbapi
 from adbc_driver_gizmosql.dbapi import Connection
 from pyarrow import Table

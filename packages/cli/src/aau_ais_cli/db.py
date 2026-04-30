@@ -20,7 +20,11 @@ def create():
         ) as con,
         con.cursor() as cur,
     ):
-        q = resources.files("aau_ais_schema").joinpath("schema.sql").read_text()
+        q = (
+            resources.files("aau_ais_schema")
+            .joinpath("sql", "create_schema.sql")
+            .read_text()
+        )
         print("[green]Creating lakehouse schema[/green]...")
         cur.execute(q)
     print("[green]Lakehouse schema created successfully.[/green]")
@@ -40,7 +44,11 @@ def drop():
             "Are you sure you want to drop the database? All data will be lost!",
             abort=True,
         )
-        q = resources.files("aau_ais_schema").joinpath("drop_schema.sql").read_text()
+        q = (
+            resources.files("aau_ais_schema")
+            .joinpath("sql", "drop_schema.sql")
+            .read_text()
+        )
         print("[red]Dropping lakehouse schema[/red]...")
         cur.execute(q)
     print("[green]Lakehouse schema dropped successfully.[/green]")
@@ -56,10 +64,10 @@ def compress():
         ) as con,
         con.cursor() as cur,
     ):
-        q = """--sql
-call ducklake_expire_snapshots('lakehouse', older_than => now() - INTERVAL '1 hour');
-call ducklake_merge_adjacent_files('lakehouse');
-call ducklake_cleanup_old_files('lakehouse', cleanup_all => true);
-"""
-        cur.execute_update(q)
+        q = (
+            resources.files("aau_ais_schema")
+            .joinpath("sql", "compaction.sql")
+            .read_text()
+        )
+        cur.executescript(q)
     print("[green]Checkpoint completed successfully.[/green]")
