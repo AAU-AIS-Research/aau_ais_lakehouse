@@ -1,31 +1,8 @@
 from functools import cache
 
-from pydantic import BaseModel, Field, SecretStr
+from aau_ais_core.settings import GizmoSqlConnectionSettings
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-class GizmoSqlConnectionSettings(BaseModel):
-    host: str
-    port: int = 3306
-    user: str
-    password: SecretStr
-    use_tls: bool = False
-    extra_db_params: dict | None = None
-    conn_kwargs: dict | None = None
-
-    @property
-    def uri(self):
-        scheme = "grpc+tls" if self.use_tls else "grpc"
-        return f"{scheme}://{self.host}:{self.port}"
-
-    @property
-    def db_kwargs(self):
-        params = self.extra_db_params or {}
-        credentials = {
-            "username": self.user,
-            "password": self.password.get_secret_value(),
-        }
-        return {**credentials, **params}
 
 
 class TrajectorySettings(BaseModel):

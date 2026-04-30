@@ -7,10 +7,17 @@ authors = [
     { name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "duckdb==1.5.*",
+    "pyarrow>=22.0.0",
+    "pydantic-settings==2.*",
+]
 
-[project.scripts]
-core = "core:main"
+[dependency-groups]
+dev = [
+  "pytest==8.4.*",
+  "pyarrow-stubs==20.*",
+]
 
 [build-system]
 requires = ["uv_build>=0.11.7,<0.12.0"]

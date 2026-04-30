@@ -7,6 +7,7 @@ name = "aau-ais-cli"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "aau-ais-core" },
     { name = "aau-ais-traj" },
     { name = "pydantic-settings" },
     { name = "typer" },
@@ -19,6 +20,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aau-ais-core", editable = "../core" },
     { name = "aau-ais-traj", editable = "../traj" },
     { name = "pydantic-settings", specifier = "==2.*" },
     { name = "typer", specifier = "==0.24.*" },
@@ -26,6 +28,29 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "pyarrow-stubs", specifier = "==20.0.*" }]
+
+[[package]]
+name = "aau-ais-core"
+version = "0.1.0"
+source = { editable = "../core" }
+dependencies = [
+    { name = "duckdb" },
+    { name = "pyarrow" },
+    { name = "pydantic-settings" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "duckdb", specifier = "==1.5.*" },
+    { name = "pyarrow", specifier = ">=22.0.0" },
+    { name = "pydantic-settings", specifier = "==2.*" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyarrow-stubs", specifier = "==20.*" },
+    { name = "pytest", specifier = "==8.4.*" },
+]
 
 [[package]]
 name = "aau-ais-schema"

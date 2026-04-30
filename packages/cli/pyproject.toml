@@ -8,6 +8,7 @@ requires-python = ">=3.13"
 dependencies = [
     "pydantic-settings==2.*",
     "typer==0.24.*",
+    "aau-ais-core",
     "aau-ais-traj"
 ]
 
@@ -17,6 +18,7 @@ dev = ["pyarrow-stubs==20.0.*"]
 
 [tool.uv.sources]
 aau-ais-traj = { path = '../traj', editable = true }
+aau-ais-core = { path = '../core', editable = true }
 
 [project.scripts]
 aauais = "aau_ais_cli.main:app"
