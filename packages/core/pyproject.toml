@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "duckdb==1.5.*",
     "pyarrow>=22.0.0",
