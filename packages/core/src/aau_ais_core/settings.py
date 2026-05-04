@@ -1,6 +1,8 @@
 from functools import cache
 from urllib import parse
 
+from adbc_driver_gizmosql import dbapi
+from adbc_driver_gizmosql.dbapi import Connection
 from pydantic import BaseModel, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -27,6 +29,14 @@ class GizmoSqlConnectionSettings(BaseModel):
             "password": self.password.get_secret_value(),
         }
         return {**credentials, **params}
+
+    def connect(self) -> Connection:
+        return dbapi.connect(
+            self.uri,
+            username=self.user,
+            password=self.password.get_secret_value(),
+            tls_skip_verify=not self.use_tls,
+        )
 
 
 class DataWarehouseConnectionSettings(BaseModel):
