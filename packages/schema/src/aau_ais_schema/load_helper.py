@@ -119,7 +119,7 @@ def join_vessel_config_ids(
     names.update(name_map)
 
     join_columns = [
-        ColumnExpression(k).alias(names[k]) for k in names if k != "vessel_config_id"
+        ColumnExpression(names[k]).alias(k) for k in names if k != "vessel_config_id"
     ]
 
     with duckdb.connect() as con, con.begin():
