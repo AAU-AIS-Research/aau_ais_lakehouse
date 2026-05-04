@@ -98,47 +98,54 @@ from src
         return con.query(q).to_arrow_table()
 
 
-def join_vessel_config_ids(src: Table, dst_con: Connection) -> Table:
+def join_vessel_config_ids(
+    src: Table, dst_con: Connection, name_map: dict[str, str] = {}
+) -> Table:
+    names = {
+        "vessel_config_id": "vessel_config_id",
+        "length": "length",
+        "width": "width",
+        "height": "height",
+        "max_draught": "max_draught",
+        "dwt": "dwt",
+        "grt": "grt",
+        "to_bow": "to_bow",
+        "to_stern": "to_stern",
+        "to_port": "to_port",
+        "to_starboard": "to_starboard",
+        "main_engine_kwh": "main_engine_kwh",
+        "aux_engine_kwh": "aux_engine_kwh",
+    }
+    names.update(name_map)
+
+    join_columns = [
+        ColumnExpression(k).alias(v) for k, v in names if k != "vessel_config_id"
+    ]
+
     with duckdb.connect() as con, con.begin():
         reader = (
-            con.from_arrow(src)
-            .select(
-                "length",
-                "width",
-                "height",
-                "max_draught",
-                "dwt",
-                "grt",
-                "to_bow",
-                "to_stern",
-                "to_port",
-                "to_starboard",
-                "main_engine_kwh",
-                "aux_engine_kwh",
-            )
-            .distinct()
-            .fetch_arrow_reader()
+            con.from_arrow(src).select(*join_columns).distinct().fetch_arrow_reader()
         )
 
         dim = vessel_config_dim.load(dst_con, reader)
-        q = """--sql
+        q = f"""--sql
 select
     src.*,
-    vessel_config_id
+    vessel_config_id as {names["vessel_config_id"]}
 from src
-    inner join dim as vcd on
-        vcd.length              is not distinct from src.length
-        and vcd.width           is not distinct from src.width
-        and vcd.height          is not distinct from src.height
-        and vcd.max_draught     is not distinct from src.max_draught
-        and vcd.dwt             is not distinct from src.dwt
-        and vcd.grt             is not distinct from src.grt
-        and vcd.to_bow          is not distinct from src.to_bow
-        and vcd.to_stern        is not distinct from src.to_stern
-        and vcd.to_port         is not distinct from src.to_port
-        and vcd.to_starboard    is not distinct from src.to_starboard
-        and vcd.main_engine_kwh is not distinct from src.main_engine_kwh
-        and vcd.aux_engine_kwh  is not distinct from src.aux_engine_kwh;
+    inner join dim on
+        dim.length              is not distinct from src.{names["length"]}
+        and dim.width           is not distinct from src.{names["width"]}
+        and dim.height          is not distinct from src.{names["height"]}
+        and dim.max_draught     is not distinct from src.{names["max_draught"]}
+        and dim.dwt             is not distinct from src.{names["dwt"]}
+        and dim.grt             is not distinct from src.{names["grt"]}
+        and dim.to_bow          is not distinct from src.{names["to_bow"]}
+        and dim.to_stern        is not distinct from src.{names["to_stern"]}
+        and dim.to_port         is not distinct from src.{names["to_port"]}
+        and dim.to_starboard    is not distinct from src.{names["to_starboard"]}
+        and dim.main_engine_kwh is not distinct from src.{names["main_engine_kwh"]}
+        and dim.aux_engine_kwh  is not distinct from src.{names["aux_engine_kwh"]};
 """
         return con.query(q).to_arrow_table()
 
