@@ -5,15 +5,15 @@ from adbc_driver_gizmosql import dbapi
 from rich import print
 from typer import Typer
 
-from aau_ais_cli.settings import Settings
+from aau_ais_cli import AISContext
 
 cli = Typer()
 
 
 @cli.command()
-def create():
+def create(ctx: AISContext):
     """[green]Creates[/green] the schema :building_construction:"""
-    settings = Settings.create()
+    settings = ctx.obj
     with (
         dbapi.connect(
             settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs
@@ -31,9 +31,9 @@ def create():
 
 
 @cli.command()
-def drop():
+def drop(ctx: AISContext):
     """[red]Drops[/red] the schema :litter_in_bin_sign:"""
-    settings = Settings.create()
+    settings = ctx.obj
     with (
         dbapi.connect(
             settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs
@@ -55,9 +55,9 @@ def drop():
 
 
 @cli.command()
-def compress():
+def compress(ctx: AISContext):
     """Compresses the lakehouse schema by merging small files"""
-    settings = Settings.create()
+    settings = ctx.obj
     with (
         dbapi.connect(
             settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs

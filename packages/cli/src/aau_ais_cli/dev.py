@@ -9,7 +9,7 @@ from adbc_driver_manager import OperationalError
 from rich import print
 from typer import Option, Typer
 
-from aau_ais_cli import db
+from aau_ais_cli import AISContext, db
 from aau_ais_cli.settings import Settings
 
 cli = Typer()
@@ -44,6 +44,7 @@ def _wait_for_gizmosql(
 
 @cli.command()
 def start(
+    ctx: AISContext,
     public: Annotated[
         bool,
         Option(
@@ -72,7 +73,7 @@ def start(
         print(e.stderr)  # This contains the actual reason Docker failed
         print("--------------------")
 
-    settings = Settings.create()
+    settings = ctx.obj
     try:
         _wait_for_gizmosql(settings)
     except RuntimeError as e:
@@ -80,7 +81,7 @@ def start(
         print("[yellow]Stopping services due to failed health check.[/yellow]")
         stop()
         return
-    db.create()
+    db.create(ctx)
 
 
 @cli.command()

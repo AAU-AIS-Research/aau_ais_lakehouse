@@ -1,6 +1,7 @@
-from typer import Typer
+from typer import Context, Typer
 
 from aau_ais_cli import db, dev, traj
+from aau_ais_cli.settings import Settings
 
 app = Typer()
 app.add_typer(
@@ -18,3 +19,8 @@ app.add_typer(
     name="traj",
     help="Trajectory utilities such as [bright_cyan]load[/bright_cyan] and [bright_cyan]load-dir[/bright_cyan]",
 )
+
+
+@app.callback()
+def settings_factory(ctx: Context):
+    ctx.obj = Settings.create()

@@ -9,6 +9,7 @@ from pyarrow import Table
 from rich import print
 from typer import Argument, Typer
 
+from aau_ais_cli import AISContext
 from aau_ais_cli.settings import Settings
 
 LoadFunc = Callable[[str, Connection, Table], None]
@@ -35,13 +36,14 @@ def __load(
 
 @cli.command()
 def load(
+    ctx: AISContext,
     trajectory_file: Annotated[
         Path, Argument(..., help="Path to the parquet file containing trajectory data.")
     ],
 ) -> None:
     """Load trajectory data into the lakehouse."""
 
-    settings = Settings.create()
+    settings = ctx.obj
 
     with (
         dbapi.connect(
@@ -60,6 +62,7 @@ def load(
 
 @cli.command()
 def load_dir(
+    ctx: AISContext,
     dir: Annotated[
         Path, Argument(..., help="Path to the directory containing trajectory data.")
     ],
@@ -70,4 +73,4 @@ def load_dir(
             print(f"Skipping {file} as it is not compatible")
             continue
         print(f"Processing {file}...")
-        load(file)
+        load(ctx, file)
