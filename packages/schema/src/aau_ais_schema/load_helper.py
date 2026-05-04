@@ -191,7 +191,7 @@ from src
 
 
 def join_destination_dim_ids(
-    src: Table, dst_con: Connection, name_map: dict[str, str]
+    src: Table, dst_con: Connection, name_map: dict[str, str] = {}
 ) -> Table:
     names = {"destination_id": "destination_id", "org_msg": "org_msg"}
     names.update(name_map)

@@ -1,19 +1,9 @@
 import duckdb
 from aau_ais_schema.dim import (
-    call_sign_dim,
-    cargo_type_dim,
-    country_dim,
     date_dim,
-    destination_dim,
-    pos_type_dim,
     time_dim,
     traj_state_change_dim,
     traj_type_dim,
-    transponder_type_dim,
-    vessel_config_dim,
-    vessel_dim,
-    vessel_name_dim,
-    vessel_type_dim,
 )
 from adbc_driver_gizmosql.dbapi import Connection
 from duckdb import ColumnExpression, DuckDBPyConnection
