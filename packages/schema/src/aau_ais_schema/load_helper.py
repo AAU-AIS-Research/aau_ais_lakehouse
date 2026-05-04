@@ -65,18 +65,22 @@ from src
         return con.query(q).to_arrow_table()
 
 
-def join_vessel_type_ids(src: Table, dst_con: Connection) -> Table:
+def join_vessel_type_ids(
+    src: Table, dst_con: Connection, name_map: dict[str, str] = {}
+) -> Table:
+    names = {"vessel_type_id": "vessel_type_id", "vessel_type": "vessel_type"}
+    names.update(name_map)
+    join_col = ColumnExpression(names["vessel_type"]).alias("vessel_type")
+
     with duckdb.connect() as con, con.begin():
-        reader = (
-            con.from_arrow(src).select("vessel_type").distinct().fetch_arrow_reader()
-        )
+        reader = con.from_arrow(src).select(join_col).distinct().fetch_arrow_reader()
         dim = vessel_type_dim.load(dst_con, reader)
-        q = """--sql
+        q = f"""--sql
 select
     src.*,
-    vessel_type_id
+    vessel_type_id as {names["vessel_type_id"]}
 from src
-    inner join dim using (vessel_type);
+    inner join dim on dim.vessel_type = src.{names["vessel_type"]};
 """
         return con.query(q).to_arrow_table()
 
