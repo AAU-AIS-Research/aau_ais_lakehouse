@@ -30,12 +30,13 @@ class GizmoSqlConnectionSettings(BaseModel):
         }
         return {**credentials, **params}
 
-    def connect(self) -> Connection:
+    def connect(self, autocommit: bool = False) -> Connection:
         return dbapi.connect(
             self.uri,
             username=self.user,
             password=self.password.get_secret_value(),
             tls_skip_verify=not self.use_tls,
+            autocommit=autocommit,
         )
 
 
