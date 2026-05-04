@@ -1,5 +1,5 @@
 import duckdb
-from aau_ais_schema import LoadContext
+from aau_ais_schema import LoadContext, load_helper
 from aau_ais_schema.dim import traj_geom_dim
 from adbc_driver_gizmosql.dbapi import Connection
 from duckdb import ConstantExpression
@@ -95,19 +95,19 @@ def load(src_id: str, dst_con: Connection, tbl: Table):
         __load_common.load_date_dim(tbl, dst_con, "end_date_id")
         __load_common.load_time_dim(tbl, dst_con, "start_time_id")
         __load_common.load_time_dim(tbl, dst_con, "end_time_id")
-        __load_common.load_country_dim(tbl, dst_con)
+        load_helper.load_country_dim(tbl, dst_con)
 
-        tbl = __load_common.join_transponder_type_ids(tbl, dst_con)
-        tbl = __load_common.join_post_type_ids(tbl, dst_con)
-        tbl = __load_common.join_vessel_name_ids(tbl, dst_con)
-        tbl = __load_common.join_vessel_type_ids(tbl, dst_con)
-        tbl = __load_common.join_vessel_ids(tbl, dst_con)
         tbl = __load_common.join_traj_type_ids(tbl, dst_con)
-        tbl = __load_common.join_vessel_config_ids(tbl, dst_con)
         tbl = __load_common.join_traj_state_change_ids(tbl, dst_con)
-        tbl = __load_common.join_call_sign_ids(tbl, dst_con)
-        tbl = __load_common.join_cargo_type_ids(tbl, dst_con)
-        tbl = __load_common.join_destination_dim_ids(
+        tbl = load_helper.join_transponder_type_ids(tbl, dst_con)
+        tbl = load_helper.join_pos_type_ids(tbl, dst_con)
+        tbl = load_helper.join_vessel_name_ids(tbl, dst_con)
+        tbl = load_helper.join_vessel_type_ids(tbl, dst_con)
+        tbl = load_helper.join_vessel_ids(tbl, dst_con)
+        tbl = load_helper.join_vessel_config_ids(tbl, dst_con)
+        tbl = load_helper.join_call_sign_ids(tbl, dst_con)
+        tbl = load_helper.join_cargo_type_ids(tbl, dst_con)
+        tbl = load_helper.join_destination_dim_ids(
             tbl,
             dst_con,
             {
@@ -115,7 +115,7 @@ def load(src_id: str, dst_con: Connection, tbl: Table):
                 "destination_id": "start_destination_id",
             },
         )
-        tbl = __load_common.join_destination_dim_ids(
+        tbl = load_helper.join_destination_dim_ids(
             tbl,
             dst_con,
             {
