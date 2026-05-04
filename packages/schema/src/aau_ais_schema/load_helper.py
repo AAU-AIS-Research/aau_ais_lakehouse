@@ -143,17 +143,24 @@ from src
         return con.query(q).to_arrow_table()
 
 
-def join_pos_type_ids(src: Table, dst_con: Connection) -> Table:
+def join_pos_type_ids(
+    src: Table, dst_con: Connection, name_map: dict[str, str] = {}
+) -> Table:
+    names = {"pos_type_id": "pos_type_id", "pos_type": "pos_type"}
+    names.update(name_map)
+
+    join_col = ColumnExpression(names["pos_type"]).alias("pos_type")
+
     with duckdb.connect() as con, con.begin():
-        reader = con.from_arrow(src).select("pos_type").distinct().fetch_arrow_reader()
+        reader = con.from_arrow(src).select(join_col).distinct().fetch_arrow_reader()
         dim = pos_type_dim.load(dst_con, reader)
 
-        q = """--sql
+        q = f"""--sql
 select
     src.*,
-    pos_type_id
+    pos_type_id as {names["pos_type_id"]}
 from src
-    inner join dim using (pos_type);
+    inner join dim on src.{names["pos_type"]} = dim.pos_type;
 """
         return con.query(q).to_arrow_table()
 
