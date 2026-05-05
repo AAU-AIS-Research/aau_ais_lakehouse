@@ -39,24 +39,33 @@ class DateIdExpander:
         return self.__date_id
 
 
-def timestamp_expander(batch: Table, timestamp: str = "timestamp") -> Table:
-    timestamp_col = ColumnExpression(timestamp)
-    q = f"""--sql
-select distinct
-    row_id,
-    strftime({timestamp_col}, '%Y%m%d')::uinteger   as date_id,
-    year({timestamp_col})                           as year_no,
-    month({timestamp_col})                          as month_no,
-    day({timestamp_col})                            as day_no,
-    weekofyear({timestamp_col})                     as week_no,
-    isodow({timestamp_col})                         as weekday_no,
-    quarter({timestamp_col})                        as quarter_no,
-    strftime({timestamp_col}, '%Y-%m-%d')           as iso_date,
-    strftime({timestamp_col}, '%B')                 as month_name
-from batch;
-"""
-    with duckdb.connect() as con:
-        return con.query(q).to_arrow_table()
+class TimestampExpander:
+    def __init__(self, timestamp: str = "timestamp"):
+        self.__timestamp = timestamp
+
+    @property
+    def timestamp(self) -> str:
+        return self.__timestamp
+
+    def __call__(self, batch: Table, row_id) -> Any:
+        row_id_col = ColumnExpression(row_id)
+        timestamp_col = ColumnExpression(self.timestamp)
+        q = f"""--sql
+    select distinct
+        {row_id_col},
+        strftime({timestamp_col}, '%Y%m%d')::uinteger   as date_id,
+        year({timestamp_col})                           as year_no,
+        month({timestamp_col})                          as month_no,
+        day({timestamp_col})                            as day_no,
+        weekofyear({timestamp_col})                     as week_no,
+        isodow({timestamp_col})                         as weekday_no,
+        quarter({timestamp_col})                        as quarter_no,
+        strftime({timestamp_col}, '%Y-%m-%d')           as iso_date,
+        strftime({timestamp_col}, '%B')                 as month_name
+    from batch;
+    """
+        with duckdb.connect() as con:
+            return con.query(q).to_arrow_table()
 
 
 class DateDim:
