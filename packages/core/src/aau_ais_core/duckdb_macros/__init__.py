@@ -144,7 +144,7 @@ create or replace macro timestamp_to_date_id(ts) as (
 def create_timestamp_to_time_id(con: DuckDBPyConnection) -> None:
     q = """--sql
 create or replace macro timestamp_to_time_id(ts) as (
-    select strftime(timestamp, '%-H%M%S')::uinteger
+    select strftime(ts, '%-H%M%S')::uinteger
 );
 """
     con.execute(q)
