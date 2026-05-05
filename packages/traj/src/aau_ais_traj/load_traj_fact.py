@@ -1,6 +1,6 @@
 import duckdb
 from aau_ais_schema import LoadContext, load_helper
-from aau_ais_schema.dim import traj_geom_dim
+from aau_ais_schema.dim import DateDim, DateIdExpander, traj_geom_dim
 from adbc_driver_gizmosql.dbapi import Connection
 from duckdb import ConstantExpression
 from pyarrow import Table
@@ -91,8 +91,9 @@ def load(src_id: str, dst_con: Connection, tbl: Table):
         tbl = __append_src(dst_con, tbl, ctx.id)
 
         ctx.ingest_started()
-        __load_common.load_date_dim(tbl, dst_con, "start_date_id")
-        __load_common.load_date_dim(tbl, dst_con, "end_date_id")
+        date_dim = DateDim(dst_con, row_id="ais_traj_id")
+        date_dim.load(tbl, pre_processors=[DateIdExpander(date_id="start_date_id")])
+        date_dim.load(tbl, pre_processors=[DateIdExpander(date_id="end_date_id")])
         __load_common.load_time_dim(tbl, dst_con, "start_time_id")
         __load_common.load_time_dim(tbl, dst_con, "end_time_id")
         load_helper.load_country_dim(tbl, dst_con)

@@ -65,13 +65,6 @@ from src
         return con.query(q).to_arrow_table()
 
 
-def load_date_dim(src: Table, dst_con: Connection, date_id_name: str):
-    col = ColumnExpression(date_id_name).alias("date_id")
-    with duckdb.connect() as con:
-        reader = con.from_arrow(src).select(col).distinct().fetch_arrow_reader()
-        date_dim.load(dst_con, reader)
-
-
 def load_time_dim(src: Table, dst_con: Connection, time_id_name: str):
     col = ColumnExpression(time_id_name).alias("time_id")
     with duckdb.connect() as con:

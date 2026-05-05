@@ -1,74 +1,165 @@
 import time
+from typing import Any, Callable
 
 import duckdb
 from adbc_driver_manager.dbapi import Connection
-from duckdb import ColumnExpression, Expression
+from duckdb import ColumnExpression
 from loguru import logger
-from pyarrow import RecordBatchReader, Table
-from pyarrow.compute import field
+from pyarrow import Table
+
+Processor = Callable[[Table, str], Table]
 
 
-def __transform(src: RecordBatchReader) -> RecordBatchReader:
-    q = """--sql
+class DateIdExpander:
+    def __init__(self, date_id: str = "date_id"):
+        self.__date_id = date_id
+
+    def __call__(self, batch: Table, row_id) -> Any:
+        row_id_col = ColumnExpression(row_id)
+        date_id_col = ColumnExpression(self.date_id)
+        q = f"""--sql
+    select distinct
+        {row_id_col},
+        {date_id_col}                    as date_id,
+        year(ts)::usmallint              as year_no,
+        month(ts)::utinyint              as month_no,
+        day(ts)::utinyint                as day_no,
+        weekofyear(ts)::utinyint         as week_no,
+        isodow(ts)::utinyint             as weekday_no,
+        quarter(ts)::utinyint            as quarter_no,
+        strftime(ts, '%Y-%m-%d')         as iso_date,
+        strftime(ts, '%B')               as month_name
+    from batch, lateral (select strptime({date_id_col}::text, '%Y%m%d')) as t(ts)
+    """
+        with duckdb.connect() as con:
+            return con.query(q).to_arrow_table()
+
+    @property
+    def date_id(self) -> str:
+        return self.__date_id
+
+
+def timestamp_expander(batch: Table, timestamp: str = "timestamp") -> Table:
+    timestamp_col = ColumnExpression(timestamp)
+    q = f"""--sql
 select distinct
-    date_id,
-    year(ts)::usmallint              as year_no,
-    month(ts)::utinyint              as month_no,
-    day(ts)::utinyint                as day_no,
-    weekofyear(ts)::utinyint         as week_no,
-    isodow(ts)::utinyint             as weekday_no,
-    quarter(ts)::utinyint            as quarter_no,
-    strftime(ts, '%Y-%m-%d')         as iso_date,
-    strftime(ts, '%B')               as month_name
-from src, lateral (select strptime(date_id::text, '%Y%m%d')) as t(ts)
+    row_id,
+    strftime({timestamp_col}, '%Y%m%d')::uinteger   as date_id,
+    year({timestamp_col})                           as year_no,
+    month({timestamp_col})                          as month_no,
+    day({timestamp_col})                            as day_no,
+    weekofyear({timestamp_col})                     as week_no,
+    isodow({timestamp_col})                         as weekday_no,
+    quarter({timestamp_col})                        as quarter_no,
+    strftime({timestamp_col}, '%Y-%m-%d')           as iso_date,
+    strftime({timestamp_col}, '%B')                 as month_name
+from batch;
 """
     with duckdb.connect() as con:
-        return con.query(q).to_arrow_reader()
+        return con.query(q).to_arrow_table()
 
 
-def __stage(dst_con: Connection, data: RecordBatchReader, staging_tbl: Expression):
+class DateDim:
+    def __init__(
+        self,
+        con: Connection,
+        catalog_name: str = "ais",
+        schema_name: str = "dim",
+        table_name: str = "date_dim",
+        row_id: str = "row_id",
+    ) -> None:
+        self.__con = con
+        self.__catalog = catalog_name
+        self.__schema = schema_name
+        self.__table = table_name
+        self.__staging_table = "staging_" + table_name
+        self.__row_id = row_id
 
-    q = f"""--sql
-alter table {staging_tbl} add column is_new boolean default true;
+    @property
+    def catalog_name(self) -> str:
+        return self.__catalog
 
-update {staging_tbl} as src
-    set is_new = false
-from dim.date_dim as dst
-where src.date_id = dst.date_id;
-"""
-    with dst_con.cursor() as curs:
-        curs.adbc_ingest(staging_tbl.get_name(), data, mode="replace", temporary=True)
-        curs.execute(q)
+    @property
+    def schema_name(self) -> str:
+        return self.__schema
 
+    @property
+    def table_name(self) -> str:
+        return self.__table
 
-def __load(dst_con: Connection, staging_tbl: Expression) -> Table:
-    q = f"""--sql
-insert into dim.date_dim by name (
-    select * exclude(is_new)
-    from {staging_tbl}
-    where is_new
+    @property
+    def staging_table_name(self) -> str:
+        return self.__staging_table
+
+    @property
+    def table(self):
+        return f'"{self.catalog_name}"."{self.schema_name}"."{self.table_name}"'
+
+    @property
+    def row_id(self) -> str:
+        return self.__row_id
+
+    def count(self) -> int:
+        with self.__con.cursor() as cursor:
+            q = f"select count(*) from {self.table}"
+            return cursor.execute(q).fetchall()[0][0]
+
+    def __pre_process(self, batch: Table, pre_processors: list[Processor]) -> Table:
+        for process in pre_processors:
+            batch = process(batch, self.row_id)
+        return batch
+
+    def __stage(self, batch: Table):
+        with self.__con.cursor() as cursor:
+            cursor.adbc_ingest(
+                table_name=self.staging_table_name,
+                data=batch,
+                mode="replace",
+                temporary=True,
+            )
+
+    def __load(self):
+        q = f"""--sql
+insert or ignore into {self.table} by name (
+    select
+        date_id,
+        year_no,
+        month_no,
+        day_no,
+        week_no,
+        weekday_no,
+        quarter_no,
+        iso_date,
+        month_name
+    from {self.staging_table_name}
 );
 """
-    with dst_con.cursor() as curs:
-        curs.execute(q)
-        return curs.execute(
-            f"select date_id, is_new from {staging_tbl};"
-        ).fetch_arrow_table()
+        with self.__con.cursor() as cursor:
+            cursor.execute(q)
 
+    def __join(self, batch: Table) -> Table:
+        row_id_col = ColumnExpression(self.row_id)
+        with self.__con.cursor() as cursor:
+            q = f"select {row_id_col}, date_id from {self.staging_table_name};"
+            inserted = cursor.execute(q).fetch_arrow_table()
+            return batch.join(inserted, keys=self.row_id, join_type="inner")
 
-def load(dst_con: Connection, data: RecordBatchReader) -> Table:
-    logger.info("Loading date_dim...")
-    s = time.perf_counter()
+    def load(self, batch: Table, pre_processors: list[Processor] = []) -> Table:
+        logger.info("Loading date_dim...")
+        start_cnt = self.count()
+        s = time.perf_counter()
 
-    staging_tbl = ColumnExpression("staging_date_dim")
+        data = self.__pre_process(batch, pre_processors)
+        self.__stage(data)
+        self.__load()
 
-    data = __transform(data)
-    __stage(dst_con, data, staging_tbl)
-    result = __load(dst_con, staging_tbl)
-    logger.info(
-        "Inserted {:,} row(s) into date_dim in {:,.2f}s",
-        len(result.filter(field("is_new"))),
-        time.perf_counter() - s,
-    )
+        end_cnt = self.count()
 
-    return result
+        logger.info(
+            "Inserted {:,} row(s) into {} in {:,.2f}s",
+            end_cnt - start_cnt,
+            self.table,
+            time.perf_counter() - s,
+        )
+
+        return self.__join(batch)
