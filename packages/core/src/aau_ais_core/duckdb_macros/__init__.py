@@ -130,3 +130,21 @@ CREATE OR REPLACE MACRO is_valid_imo(imo) AS (
                 ELSE (SELECT check_digit = comp_check_digit FROM imo_checksum(imo))
             END
 );""")
+
+
+def create_timestamp_to_date_id(con: DuckDBPyConnection) -> None:
+    q = """--sql
+create or replace macro timestamp_to_date_id(ts) as (
+    select strftime(ts, '%Y%m%d')::uinteger
+);
+"""
+    con.execute(q)
+
+
+def create_timestamp_to_time_id(con: DuckDBPyConnection) -> None:
+    q = """--sql
+create or replace macro timestamp_to_time_id(ts) as (
+    select strftime(timestamp, '%-H%M%S')::uinteger
+);
+"""
+    con.execute(q)
