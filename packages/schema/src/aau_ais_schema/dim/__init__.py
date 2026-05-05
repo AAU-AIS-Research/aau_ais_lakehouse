@@ -1,5 +1,1 @@
-from aau_ais_schema.dim.date_dim import (
-    DateDim,
-    DateIdExpander,
-    TimestampExpander,
-)
+from aau_ais_schema.dim.date_dim import DateDim, DateIdExpander

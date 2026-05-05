@@ -91,9 +91,13 @@ def load(src_id: str, dst_con: Connection, tbl: Table):
         tbl = __append_src(dst_con, tbl, ctx.id)
 
         ctx.ingest_started()
-        date_dim = DateDim(dst_con, row_id="ais_stop_id")
-        date_dim.load(tbl, pre_processors=[DateIdExpander(date_id="start_date_id")])
-        date_dim.load(tbl, pre_processors=[DateIdExpander(date_id="end_date_id")])
+        date_dim = DateDim(dst_con)
+        date_dim.load(
+            tbl, pre_processors=[DateIdExpander()], keys={"date_id": "start_date_id"}
+        )
+        date_dim.load(
+            tbl, pre_processors=[DateIdExpander()], keys={"date_id": "end_date_id"}
+        )
         __load_common.load_time_dim(tbl, dst_con, "start_time_id")
         __load_common.load_time_dim(tbl, dst_con, "end_time_id")
         load_helper.load_country_dim(tbl, dst_con)
