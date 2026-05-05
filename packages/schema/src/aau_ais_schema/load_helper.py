@@ -8,6 +8,7 @@ from aau_ais_schema.dim import (
     cargo_type_dim,
     country_dim,
     destination_dim,
+    nav_status_dim,
     pos_type_dim,
     transponder_type_dim,
     vessel_config_dim,
@@ -230,6 +231,27 @@ select
     destination_id as {names["destination_id"]}
 from src
     inner join dim on src.{names["org_msg"]} = dim.org_msg;
+"""
+        return con.query(q).to_arrow_table()
+
+
+def join_nav_status_dim_ids(
+    src: Table, dst_con: Connection, name_map: dict[str, str] = {}
+) -> Table:
+    names = {"nav_status_id": "nav_status_id", "nav_status": "nav_status"}
+    names.update(name_map)
+    join_col = ColumnExpression(names["nav_status"]).alias("nav_status")
+
+    with duckdb.connect() as con, con.begin():
+        reader = con.from_arrow(src).select(join_col).distinct().fetch_arrow_reader()
+        dim = nav_status_dim.load(dst_con, reader)
+
+        q = f"""--sql
+select
+    src.*,
+    nav_status_id as {names["nav_status_id"]}
+from src
+    inner join dim on dim.nav_status = src.{names["nav_status"]};
 """
         return con.query(q).to_arrow_table()
 
