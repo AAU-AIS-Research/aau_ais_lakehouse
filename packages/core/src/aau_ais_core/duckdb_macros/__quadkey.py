@@ -55,6 +55,40 @@ create or replace macro quadkey_int64_encode(qkey) as (
     con.execute(q)
 
 
+def create_quadkey_uint16_encode(con: DuckDBPyConnection):
+    create_quadkey_bit_encode(con)
+
+    q = """--sql
+create or replace macro quadkey_uint16_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::usmallint as qkey
+);
+"""
+    con.execute(q)
+
+
+def create_quadkey_uint32_encode(con: DuckDBPyConnection):
+    create_quadkey_bit_encode(con)
+
+    q = """--sql
+create or replace macro quadkey_uint32_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::uinteger as qkey
+);
+
+"""
+    con.execute(q)
+
+
+def create_quadkey_uint64_encode(con: DuckDBPyConnection):
+    create_quadkey_bit_encode(con)
+
+    q = """--sql
+create or replace macro quadkey_uint64_encode(qkey) as (
+    select quadkey_bit_encode(qkey)::ubigint as qkey
+);
+"""
+    con.execute(q)
+
+
 def create_quadkey_to_zxy(con: DuckDBPyConnection):
     q = """--sql
 create or replace macro quadkey_to_zxy(qkey) as table (
