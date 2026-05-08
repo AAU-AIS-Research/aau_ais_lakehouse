@@ -5,7 +5,6 @@ from typing import Callable
 
 import duckdb
 from aau_ais_core import duckdb_utils
-from aau_ais_core.duckdb_utils import ColumnInfo
 from adbc_driver_manager.dbapi import Connection
 from jinja2 import Template
 from loguru import logger
