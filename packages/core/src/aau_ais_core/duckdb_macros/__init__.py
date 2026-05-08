@@ -141,6 +141,15 @@ create or replace macro timestamp_to_date_id(ts) as (
     con.execute(q)
 
 
+def create_date_id_to_timestamp(con: DuckDBPyConnection) -> None:
+    q = """--sql
+create or replace macro date_id_to_timestamp(date_id) as (
+    select strptime(date_id::text, '%Y%m%d')
+);
+"""
+    con.execute(q)
+
+
 def create_timestamp_to_time_id(con: DuckDBPyConnection) -> None:
     q = """--sql
 create or replace macro timestamp_to_time_id(ts) as (
@@ -148,3 +157,14 @@ create or replace macro timestamp_to_time_id(ts) as (
 );
 """
     con.execute(q)
+
+
+def create_time_id_to_timestamp(con: DuckDBPyConnection) -> None:
+    q = """--sql
+create or replace macro time_id_to_timestamp(time_id) as
+    strptime(lpad(time_id::text, 6, '0'), '%H%M%S');
+"""
+    con.execute(q)
+
+
+#

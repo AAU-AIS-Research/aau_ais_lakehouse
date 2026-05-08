@@ -1,43 +1,30 @@
 import duckdb
-from aau_ais_schema import LoadContext, load_helper
-from aau_ais_schema.dim import DateDim, DateIdExpander, traj_geom_dim
+from aau_ais_schema import LoadContext
+from aau_ais_schema.dim import (
+    CallSignDim,
+    CargoTypeDim,
+    CountryDim,
+    DateDim,
+    DateIdExpander,
+    DestinationDim,
+    PosTypeDim,
+    TimeDim,
+    TimeIdExpander,
+    TrajCustFieldExpander,
+    TrajGeomDim,
+    TrajStateChangeDim,
+    TrajTypeDim,
+    TransponderTypeDim,
+    VesselConfigDim,
+    VesselDim,
+    VesselNameDim,
+    VesselTypeDim,
+)
 from adbc_driver_gizmosql.dbapi import Connection
-from duckdb import ConstantExpression
+from loguru import logger
 from pyarrow import Table
 
-from aau_ais_traj import JINJA_ENV, __load_common, utils
-
-
-def join_traj_geom_ids(src: Table, dst_con: Connection) -> Table:
-    with utils.get_spatial_con() as con, con.begin():
-        data = (
-            con.from_arrow(src)
-            .select(
-                "ais_traj_id",
-                "geom",
-                "start_point",
-                "end_point",
-                "is_simple_geom",
-                "is_valid_geom",
-                ConstantExpression("LINESTRING EMPTY").alias("cust_simplified_geom_00"),
-                ConstantExpression("LINESTRING EMPTY").alias("cust_simplified_geom_01"),
-                ConstantExpression("LINESTRING EMPTY").alias("cust_simplified_geom_02"),
-                ConstantExpression("LINESTRING EMPTY").alias("cust_simplified_geom_03"),
-                ConstantExpression("LINESTRING EMPTY").alias("cust_simplified_geom_04"),
-            )
-            .fetch_arrow_reader(500)
-        )
-
-        dim = traj_geom_dim.load(dst_con, data)
-
-        q = """--sql
-select
-    src.*,
-    geom_id
-from src
-    inner join dim using (ais_traj_id);
-"""
-        return con.query(q).to_arrow_table()
+from aau_ais_traj import JINJA_ENV
 
 
 def __get_max_fact_id(dst_con: Connection) -> int:
@@ -50,16 +37,17 @@ def __get_max_fact_id(dst_con: Connection) -> int:
         )
 
 
-def __append_src(dst_con: Connection, tbl: Table, load_id: int):
-    with duckdb.connect() as src_con, src_con.begin() as transaction:
+def __append_src(dst_con: Connection, tbl: Table, load_id: int) -> Table:
+    with duckdb.connect() as src_con, src_con.begin():
         max_fact_id = __get_max_fact_id(dst_con)
         select = f"""--sql
 {max_fact_id} + row_number() over ()    as ais_traj_id,
 {load_id}                               as load_id,
 *
+replace (coalesce(prev_obj_type, 'unknown') as prev_obj_type)
 """
         return (
-            transaction.from_arrow(tbl)
+            src_con.from_arrow(tbl)
             .filter("type = 'in motion'")
             .select(select)
             .fetch_arrow_table()
@@ -89,52 +77,55 @@ def __load_fact(dst_con: Connection, src: Table) -> None:
 def load(src_id: str, dst_con: Connection, tbl: Table):
     with LoadContext(src_id, "lakehouse.fact.ais_traj_fact", dst_con) as ctx:
         tbl = __append_src(dst_con, tbl, ctx.id)
+        start_tbl_length = len(tbl)
 
         ctx.ingest_started()
-        date_dim = DateDim(dst_con)
-        date_dim.load(
-            tbl,
-            pre_processors=[DateIdExpander()],
-            keys={"date_id": "start_date_id"},
-        )
-        date_dim.load(
-            tbl,
-            pre_processors=[DateIdExpander()],
-            keys={"date_id": "start_date_id"},
-        )
-        __load_common.load_time_dim(tbl, dst_con, "start_time_id")
-        __load_common.load_time_dim(tbl, dst_con, "end_time_id")
-        load_helper.load_country_dim(tbl, dst_con)
+        # Date Dimension
+        date_dim = DateDim(dst_con, pre_processors=[DateIdExpander()])
+        date_dim.load(tbl, name_map={"date_id": "start_date_id"})
+        date_dim.load(tbl, name_map={"date_id": "end_date_id"})
 
-        tbl = __load_common.join_traj_type_ids(tbl, dst_con)
-        tbl = __load_common.join_traj_state_change_ids(tbl, dst_con)
-        tbl = load_helper.join_transponder_type_ids(tbl, dst_con)
-        tbl = load_helper.join_pos_type_ids(tbl, dst_con)
-        tbl = load_helper.join_vessel_name_ids(tbl, dst_con)
-        tbl = load_helper.join_vessel_type_ids(tbl, dst_con)
-        tbl = load_helper.join_vessel_ids(tbl, dst_con)
-        tbl = load_helper.join_vessel_config_ids(tbl, dst_con)
-        tbl = load_helper.join_call_sign_ids(tbl, dst_con)
-        tbl = load_helper.join_cargo_type_ids(tbl, dst_con)
-        tbl = load_helper.join_destination_dim_ids(
+        # Time Dimension
+        time_dim = TimeDim(dst_con, pre_processors=[TimeIdExpander()])
+        time_dim.load(tbl, name_map={"time_id": "start_time_id"})
+        time_dim.load(tbl, name_map={"time_id": "end_time_id"})
+
+        CountryDim(dst_con).load(tbl)
+        tbl = VesselConfigDim(dst_con).load(tbl)
+        tbl = TrajTypeDim(dst_con).load(
             tbl,
-            dst_con,
-            {
+            name_map={"traj_type": "prev_obj_type", "traj_type_id": "prev_obj_type_id"},
+        )
+        tbl = TrajStateChangeDim(dst_con).load(tbl)
+        tbl = TransponderTypeDim(dst_con).load(tbl)
+        tbl = PosTypeDim(dst_con).load(tbl)
+        tbl = VesselNameDim(dst_con).load(tbl)
+        tbl = VesselTypeDim(dst_con).load(tbl)
+        tbl = VesselDim(dst_con).load(tbl)
+        tbl = CallSignDim(dst_con).load(tbl)
+        tbl = CargoTypeDim(dst_con).load(tbl)
+        destination_dim = DestinationDim(dst_con)
+        tbl = destination_dim.load(
+            tbl,
+            name_map={
                 "org_msg": "start_destination_msg",
                 "destination_id": "start_destination_id",
             },
         )
-        tbl = load_helper.join_destination_dim_ids(
+        tbl = destination_dim.load(
             tbl,
-            dst_con,
-            {
+            name_map={
                 "org_msg": "end_destination_msg",
                 "destination_id": "end_destination_id",
             },
         )
-        tbl = join_traj_geom_ids(tbl, dst_con)
+
+        tbl = TrajGeomDim(dst_con, pre_processors=[TrajCustFieldExpander()]).load(tbl)
+
+        assert len(tbl) - start_tbl_length == 0
+        logger.info("Committing dimension table ingest")
         dst_con.commit()
+        logger.info("Dimension ingestion committed")
 
         __load_fact(dst_con, tbl)
-
         ctx.ingest_stopped()

@@ -8,12 +8,17 @@ requires-python = ">=3.12"
 dependencies = [
     "adbc-driver-manager==1.11.*",
     "duckdb==1.5.*",
+    "jinja2==3.*",
     "loguru==0.7.*",
-    "pyarrow>=23"
+    "pyarrow>=23",
+    "aau-ais-core"
 ]
 
 [dependency-groups]
 dev = ["pyarrow-stubs==20.0.*"]
+
+[tool.uv.sources]
+aau-ais-core = { path = '../core', editable = true }
 
 [project.scripts]
 schema = "schema:main"

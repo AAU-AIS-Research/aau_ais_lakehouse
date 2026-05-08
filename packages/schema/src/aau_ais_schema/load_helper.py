@@ -6,12 +6,10 @@ from pyarrow import Table
 from aau_ais_schema.dim import (
     call_sign_dim,
     cargo_type_dim,
-    country_dim,
     destination_dim,
     nav_status_dim,
     pos_type_dim,
     transponder_type_dim,
-    vessel_config_dim,
     vessel_dim,
     vessel_name_dim,
     vessel_type_dim,
@@ -103,58 +101,6 @@ select
     vessel_name_id as {names["vessel_name_id"]}
 from src
     inner join dim on dim.vessel_name = src.{names["vessel_name"]};
-"""
-        return con.query(q).to_arrow_table()
-
-
-def join_vessel_config_ids(
-    src: Table, dst_con: Connection, name_map: dict[str, str] = {}
-) -> Table:
-    names = {
-        "vessel_config_id": "vessel_config_id",
-        "length": "length",
-        "width": "width",
-        "height": "height",
-        "max_draught": "max_draught",
-        "dwt": "dwt",
-        "grt": "grt",
-        "to_bow": "to_bow",
-        "to_stern": "to_stern",
-        "to_port": "to_port",
-        "to_starboard": "to_starboard",
-        "main_engine_kwh": "main_engine_kwh",
-        "aux_engine_kwh": "aux_engine_kwh",
-    }
-    names.update(name_map)
-
-    join_columns = [
-        ColumnExpression(names[k]).alias(k) for k in names if k != "vessel_config_id"
-    ]
-
-    with duckdb.connect() as con, con.begin():
-        reader = (
-            con.from_arrow(src).select(*join_columns).distinct().fetch_arrow_reader()
-        )
-
-        dim = vessel_config_dim.load(dst_con, reader)
-        q = f"""--sql
-select
-    src.*,
-    vessel_config_id as {names["vessel_config_id"]}
-from src
-    inner join dim on
-        dim.length              is not distinct from src.{names["length"]}
-        and dim.width           is not distinct from src.{names["width"]}
-        and dim.height          is not distinct from src.{names["height"]}
-        and dim.max_draught     is not distinct from src.{names["max_draught"]}
-        and dim.dwt             is not distinct from src.{names["dwt"]}
-        and dim.grt             is not distinct from src.{names["grt"]}
-        and dim.to_bow          is not distinct from src.{names["to_bow"]}
-        and dim.to_stern        is not distinct from src.{names["to_stern"]}
-        and dim.to_port         is not distinct from src.{names["to_port"]}
-        and dim.to_starboard    is not distinct from src.{names["to_starboard"]}
-        and dim.main_engine_kwh is not distinct from src.{names["main_engine_kwh"]}
-        and dim.aux_engine_kwh  is not distinct from src.{names["aux_engine_kwh"]};
 """
         return con.query(q).to_arrow_table()
 
@@ -254,26 +200,3 @@ from src
     inner join dim on dim.nav_status = src.{names["nav_status"]};
 """
         return con.query(q).to_arrow_table()
-
-
-def load_country_dim(src: Table, dst_con: Connection):
-
-    with duckdb.connect() as con:
-        reader = (
-            con.from_arrow(src)
-            .select(
-                "alpha2",
-                "alpha3",
-                "country_name",
-                "country_code",
-                "region",
-                "sub_region",
-                "intermediate_region",
-                "region_code",
-                "sub_region_code",
-                "intermediate_region_code",
-            )
-            .distinct()
-            .fetch_arrow_reader()
-        )
-        country_dim.load(dst_con, reader)

@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 from typing import Annotated, Callable
 
@@ -10,7 +11,6 @@ from rich import print
 from typer import Argument, Typer
 
 from aau_ais_cli import AISContext
-from aau_ais_cli.settings import Settings
 
 LoadFunc = Callable[[str, Connection, Table], None]
 
@@ -68,9 +68,21 @@ def load_dir(
     ],
 ) -> None:
     """Load a directory of trajectory files into the lakehouse."""
+    s = time.perf_counter()
     for file in dir.iterdir():
         if not utils.is_traj_file(file):
             print(f"Skipping {file} as it is not compatible")
             continue
         print(f"Processing {file}...")
         load(ctx, file)
+    print(f"Load took {time.perf_counter() - s} seconds")
+
+
+# 209.66 seconds
+# 211.01 seconds
+# 215.33 seconds
+# 216.76 seconds
+# 216.34 seconds
+# 217.05 seconds
+# 216.68 seconds
+# 219.38 seconds
