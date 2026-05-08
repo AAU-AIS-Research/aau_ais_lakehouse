@@ -4,6 +4,8 @@ from collections.abc import Sequence
 from typing import Callable
 
 import duckdb
+from aau_ais_core import duckdb_utils
+from aau_ais_core.duckdb_utils import ColumnInfo
 from adbc_driver_manager.dbapi import Connection
 from jinja2 import Template
 from loguru import logger
@@ -98,6 +100,23 @@ from batch;
         with duckdb.connect().begin() as con:
             return con.query(q).fetch_arrow_table()
 
+    def __cast_geometry_columns(self, con: Connection, src_tbl: str) -> None:
+        """This is a workaround accommodating an issue where geometry data is inserted as Blobs"""
+        geom_columns = [
+            col
+            for col in duckdb_utils.fetch_columns(con, self.table)
+            if col.type.lower().startswith("geometry")
+        ]
+        if len(geom_columns) == 0:
+            return
+
+        q = ""
+        for col in geom_columns:
+            q += f"alter table {src_tbl} alter {col.name} set data type geometry using ST_GeomFromWKB({col.name});\n"
+
+        with con.cursor() as curs:
+            curs.execute(q)
+
     def __stage(self, batch: Table):
         with self._con.cursor() as cursor:
             cursor.adbc_ingest(
@@ -106,6 +125,8 @@ from batch;
                 mode="replace",
                 temporary=True,
             )
+        # The below should be a temporary fix to GizmoSQL adbc driver ingesting geometry columns as blob
+        self.__cast_geometry_columns(self._con, self.staging_table_name)
 
     def load(
         self,

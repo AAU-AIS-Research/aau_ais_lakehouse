@@ -76,13 +76,3 @@ def load_dir(
         print(f"Processing {file}...")
         load(ctx, file)
     print(f"Load took {time.perf_counter() - s} seconds")
-
-
-# 209.66 seconds
-# 211.01 seconds
-# 215.33 seconds
-# 216.76 seconds
-# 216.34 seconds
-# 217.05 seconds
-# 216.68 seconds
-# 219.38 seconds

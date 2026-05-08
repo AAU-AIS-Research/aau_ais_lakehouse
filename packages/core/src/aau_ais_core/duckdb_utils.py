@@ -1,8 +1,20 @@
 import asyncio
+from dataclasses import dataclass
 from pathlib import Path
 
 import duckdb
+from adbc_driver_manager.dbapi import Connection
 from duckdb import DuckDBPyConnection, DuckDBPyRelation
+
+
+@dataclass(slots=True, frozen=True)
+class ColumnInfo:
+    name: str
+    type: str
+    null: str
+    key: str
+    default: str
+    extra: str
 
 
 def pg_query(con: DuckDBPyConnection, db: str, sql: str):
@@ -100,3 +112,21 @@ def get_spatial_con(
     # con.execute("CALL register_geoarrow_extensions();")
 
     return con
+
+
+def fetch_columns(con: Connection, dst_tbl: str):
+    q = f"""--sql
+select
+    column_name,
+    column_type,
+    "null",
+    "key",
+    "default",
+    extra
+from (describe {dst_tbl});
+"""
+    with con.cursor() as curs:
+        res = curs.execute(q).fetchall()
+        if len(res) == 0:
+            raise ValueError(f"{dst_tbl} does not seem to exist")
+        return [ColumnInfo(*columns) for columns in res]
