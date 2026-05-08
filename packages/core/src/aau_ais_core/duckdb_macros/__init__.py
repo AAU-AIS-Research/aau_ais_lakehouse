@@ -14,6 +14,9 @@ from .__quadkey import (
     create_quadkey_int32_encode,
     create_quadkey_int64_encode,
     create_quadkey_to_zxy,
+    create_quadkey_uint16_encode,
+    create_quadkey_uint32_encode,
+    create_quadkey_uint64_encode,
     create_zxy_to_quadkey,
 )
 from .__wgs84_grid import (
