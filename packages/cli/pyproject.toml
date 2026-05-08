@@ -27,5 +27,5 @@ aauais = "aau_ais_cli.main:app"
 requires = ["uv_build>=0.11.7,<0.12.0"]
 build-backend = "uv_build"
 
-[tool.uv.build-backend]
-source-include = ["/compose.dev.yaml"]
+# [tool.uv.build-backend]
+# source-include = ["/docker/compose.dev.yaml", "/docker/init.sql"]

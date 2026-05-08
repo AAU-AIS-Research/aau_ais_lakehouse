@@ -14,7 +14,7 @@ from aau_ais_cli.settings import Settings
 
 cli = Typer()
 
-COMPOSE_FILE = Path(__file__).parents[2] / "compose.dev.yaml"
+COMPOSE_FILE = Path(__file__).parent / "docker" / "compose.dev.yaml"
 
 
 def _wait_for_gizmosql(
@@ -45,6 +45,7 @@ def _wait_for_gizmosql(
 @cli.command()
 def start(
     ctx: AISContext,
+    env_file: Annotated[Path | None, Option(help="Path to a .env file")] = None,
     public: Annotated[
         bool,
         Option(
@@ -53,7 +54,11 @@ def start(
     ] = False,
 ):
     """Start the development docker stack"""
-    cmd = ["docker", "compose", "-f", COMPOSE_FILE.as_posix(), "up", "-d"]
+    cmd = ["docker", "compose", "-f", COMPOSE_FILE.as_posix()]
+    if env_file:
+        cmd.extend(["--env-file", env_file.as_posix()])
+
+    cmd.extend(["up", "-d"])
     print("Starting services...")
     if public:
         os.environ["GIZMOSQL_IP"] = "0.0.0.0"
@@ -85,8 +90,12 @@ def start(
 
 
 @cli.command()
-def stop():
+def stop(env_file: Annotated[Path | None, Option(help="Path to a .env file")] = None):
     """Stop the development docker stack"""
-    cmd = ["docker", "compose", "-f", COMPOSE_FILE, "down"]
+    cmd = ["docker", "compose", "-f", COMPOSE_FILE]
+    if env_file:
+        cmd.extend(["--env-file", env_file.as_posix()])
+    cmd.append("down")
+
     print("stopping services...")
     subprocess.run(cmd)
