@@ -4,7 +4,6 @@ import time
 from pathlib import Path
 from typing import Annotated
 
-from adbc_driver_gizmosql import dbapi
 from adbc_driver_manager import OperationalError
 from rich import print
 from typer import Option, Typer
@@ -28,10 +27,7 @@ def _wait_for_gizmosql(
     )
     for attempt in range(max_retries):
         try:
-            # Try to create a TCP connection
-            with dbapi.connect(
-                settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs
-            ) as _:
+            with settings.gizmosql.connect() as _:
                 print("[green]GizmoSQL is ready![/green]")
                 return True
         except (OperationalError, OSError):
