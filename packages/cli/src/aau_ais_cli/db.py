@@ -1,7 +1,6 @@
 from importlib import resources
 
 import typer
-from adbc_driver_gizmosql import dbapi
 from rich import print
 from typer import Typer
 
@@ -14,10 +13,9 @@ cli = Typer()
 def create(ctx: AISContext):
     """[green]Creates[/green] the schema :building_construction:"""
     settings = ctx.obj
+
     with (
-        dbapi.connect(
-            settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs
-        ) as con,
+        settings.gizmosql.connect() as con,
         con.cursor() as cur,
     ):
         q = (
@@ -27,6 +25,7 @@ def create(ctx: AISContext):
         )
         print("[green]Creating lakehouse schema[/green]...")
         cur.execute(q)
+        con.commit()
     print("[green]Lakehouse schema created successfully.[/green]")
 
 
@@ -35,9 +34,7 @@ def drop(ctx: AISContext):
     """[red]Drops[/red] the schema :litter_in_bin_sign:"""
     settings = ctx.obj
     with (
-        dbapi.connect(
-            settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs
-        ) as con,
+        settings.gizmosql.connect() as con,
         con.cursor() as cur,
     ):
         typer.confirm(
@@ -51,6 +48,7 @@ def drop(ctx: AISContext):
         )
         print("[red]Dropping lakehouse schema[/red]...")
         cur.execute(q)
+        con.commit()
     print("[green]Lakehouse schema dropped successfully.[/green]")
 
 
@@ -59,9 +57,7 @@ def compress(ctx: AISContext):
     """Compresses the lakehouse schema by merging small files"""
     settings = ctx.obj
     with (
-        dbapi.connect(
-            settings.gizmosql.uri, db_kwargs=settings.gizmosql.db_kwargs
-        ) as con,
+        settings.gizmosql.connect() as con,
         con.cursor() as cur,
     ):
         q = (
@@ -70,4 +66,5 @@ def compress(ctx: AISContext):
             .read_text()
         )
         cur.executescript(q)
+        con.commit()
     print("[green]Checkpoint completed successfully.[/green]")
