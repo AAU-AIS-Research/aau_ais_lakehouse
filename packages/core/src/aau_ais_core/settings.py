@@ -13,6 +13,7 @@ class GizmoSqlConnectionSettings(BaseModel):
     user: str
     password: SecretStr
     use_tls: bool = False
+    skip_tls_verify: bool = False
     extra_db_params: dict | None = None
     conn_kwargs: dict | None = None
 
@@ -35,7 +36,7 @@ class GizmoSqlConnectionSettings(BaseModel):
             self.uri,
             username=self.user,
             password=self.password.get_secret_value(),
-            tls_skip_verify=not self.use_tls,
+            tls_skip_verify=self.skip_tls_verify,
             autocommit=autocommit,
         )
 
