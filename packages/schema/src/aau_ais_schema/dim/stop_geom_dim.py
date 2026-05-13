@@ -56,4 +56,5 @@ class StopGeomDim(Dimension):
             columns=keys + attributes,
             merge_strategy=merge_strategy,
             pre_processors=pre_processors,
+            max_ingest_chunk_size=1000000,
         )
