@@ -20,7 +20,7 @@ from aau_ais_schema.dim import (
     VesselNameDim,
     VesselTypeDim,
 )
-from adbc_driver_gizmosql.dbapi import Connection
+from adbc_driver_manager.dbapi import Connection
 from loguru import logger
 from pyarrow import Table
 

@@ -119,16 +119,16 @@ wheels = [
 
 [[package]]
 name = "adbc-driver-gizmosql"
-version = "1.1.6"
+version = "1.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "adbc-driver-flightsql" },
     { name = "adbc-driver-manager" },
     { name = "pyarrow" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/49/ed/6493b09658e2bf3a7e0a7c7ea0fe055184126098577de7ab6ce1d04c0936/adbc_driver_gizmosql-1.1.6.tar.gz", hash = "sha256:f80960e016891e82f3e800542b6b09a0c5ea954ba6d6e5bc739323e9fa6dbb03", size = 29288, upload-time = "2026-05-06T14:13:29.591Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/63/e6/3e99a9b8069c3dd0f0a5adebdb5be6a2b2ef937a92c1dd51720c5a5b5476/adbc_driver_gizmosql-1.1.7.tar.gz", hash = "sha256:8b40dfb6be00a90333ba6d105feab625cfb3304b118a95e13a3b18672776f081", size = 29326, upload-time = "2026-05-10T20:28:48.613Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/34/a3/3256c484f66269399562ea7b55e24a8f1b0e6228e69887d5a28892a18d1c/adbc_driver_gizmosql-1.1.6-py3-none-any.whl", hash = "sha256:b0cdbf0cd458af2abffc3c031d5b0e03bc0755fcea821a52efd2a2d73f93d61d", size = 18537, upload-time = "2026-05-06T14:13:28.347Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/81/72b243bf3f5c5059df3abe2bf9853f140c020c4ee74ad860f6617f930191/adbc_driver_gizmosql-1.1.7-py3-none-any.whl", hash = "sha256:2a25a637caed72281c5ecaa50f16e79209ca452df90980d3ec041933b61734d1", size = 18562, upload-time = "2026-05-10T20:28:46.879Z" },
 ]
 
 [[package]]

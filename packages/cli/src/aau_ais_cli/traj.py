@@ -4,8 +4,7 @@ from typing import Annotated, Callable
 
 from aau_ais_schema import LoadContext
 from aau_ais_traj import load_stop_fact, load_traj_fact, utils
-from adbc_driver_gizmosql import dbapi
-from adbc_driver_gizmosql.dbapi import Connection
+from adbc_driver_manager.dbapi import Connection
 from pyarrow import Table
 from rich import print
 from typer import Argument, Typer
@@ -47,13 +46,7 @@ def load(
     settings = ctx.obj
 
     for f in traj_file:
-        with (
-            dbapi.connect(
-                settings.gizmosql.uri,
-                db_kwargs=settings.gizmosql.db_kwargs,
-                autocommit=False,
-            ) as con,
-        ):
+        with settings.gizmosql.connect() as con:
             print(f"Processing {f}...")
             if not utils.is_traj_file(f):
                 print(f"[yellow]Skipping {f} as it is not compatible[/yellow]")
