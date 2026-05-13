@@ -37,42 +37,42 @@ def __load(
 @cli.command()
 def load(
     ctx: AISContext,
-    trajectory_file: Annotated[
-        Path, Argument(..., help="Path to the parquet file containing trajectory data.")
+    traj_file: Annotated[
+        list[Path],
+        Argument(..., help="Path to the parquet file(s) containing trajectory data."),
     ],
 ) -> None:
     """Load trajectory data into the lakehouse."""
 
     settings = ctx.obj
 
-    with (
-        dbapi.connect(
-            settings.gizmosql.uri,
-            db_kwargs=settings.gizmosql.db_kwargs,
-            autocommit=False,
-        ) as con,
-    ):
-        __load(
-            trajectory_file, "lakehouse.fact.ais_traj_fact", con, load_traj_fact.load
-        )
-        __load(
-            trajectory_file, "lakehouse.fact.ais_stop_fact", con, load_stop_fact.load
-        )
+    for f in traj_file:
+        with (
+            dbapi.connect(
+                settings.gizmosql.uri,
+                db_kwargs=settings.gizmosql.db_kwargs,
+                autocommit=False,
+            ) as con,
+        ):
+            print(f"Processing {f}...")
+            if not utils.is_traj_file(f):
+                print(f"[yellow]Skipping {f} as it is not compatible[/yellow]")
+                continue
+            __load(f, "lakehouse.fact.ais_traj_fact", con, load_traj_fact.load)
+            __load(f, "lakehouse.fact.ais_stop_fact", con, load_stop_fact.load)
 
 
-@cli.command()
+@cli.command(deprecated=True)
 def load_dir(
     ctx: AISContext,
     dir: Annotated[
         Path, Argument(..., help="Path to the directory containing trajectory data.")
     ],
 ) -> None:
-    """Load a directory of trajectory files into the lakehouse."""
+    """Load a directory of trajectory files into the lakehouse.
+    [black]Deprecated, please use load with glob pattern, brace expansion or similar[/black]
+    """
     s = time.perf_counter()
-    for file in dir.iterdir():
-        if not utils.is_traj_file(file):
-            print(f"Skipping {file} as it is not compatible")
-            continue
-        print(f"Processing {file}...")
-        load(ctx, file)
+    files = list(dir.iterdir())
+    load(ctx, files)
     print(f"Load took {time.perf_counter() - s} seconds")
