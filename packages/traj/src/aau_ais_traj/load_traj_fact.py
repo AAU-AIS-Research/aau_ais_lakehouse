@@ -122,7 +122,9 @@ def load(src_id: str, dst_con: Connection, tbl: Table):
 
         tbl = TrajGeomDim(dst_con, pre_processors=[TrajCustFieldExpander()]).load(tbl)
 
-        assert len(tbl) - start_tbl_length == 0
+        assert len(tbl) - start_tbl_length == 0, (
+            f"Source length: {start_tbl_length} is not equal to table length after processing: {len(tbl)}"
+        )
         logger.info("Committing dimension table ingest")
         dst_con.commit()
         logger.info("Dimension ingestion committed")

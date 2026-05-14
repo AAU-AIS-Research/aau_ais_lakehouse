@@ -176,9 +176,13 @@ set end_ts = to_timestamp(?),
     failed = true
 where load_id = ?;"""
         with self.__con.cursor() as curs:
+            logger.error("Load failed, performing roleback")
             self.__roleback()
+            logger.info("Roleback completed")
 
             epoch = time.time()
+
+            logger.info("Wrapping up load dimension")
             curs.execute(
                 q, parameters=[epoch, epoch, self.load_id, self.load_id]
             ).fetchall()
