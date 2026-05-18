@@ -65,7 +65,7 @@ merge into {{dst_tbl}} as dst
 
     def __fetch(self, con: Connection, src_tbl: str, dst_tbl: str) -> Table:
         template_str = """--sql
-select
+select distinct
     r.{{surrogate_key}}
     {%- for key in keys %}
     ,l.{{key}}
