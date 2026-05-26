@@ -10,6 +10,7 @@ from jinja2 import Template
 from loguru import logger
 from pyarrow import Table
 
+from aau_ais_schema import utils
 from aau_ais_schema.merge_strategies import MergeStrategy
 
 Processor = Callable[[Table, dict[str, str]], Table]
@@ -25,7 +26,6 @@ class Dimension(ABC):
         columns: Sequence[str],
         merge_strategy: MergeStrategy,
         pre_processors: list[Processor] = [],
-        max_ingest_chunk_size: int | None = None,
     ) -> None:
         self._con = con
         self.__catalog = catalog_name
@@ -35,7 +35,6 @@ class Dimension(ABC):
         self.__columns = columns
         self.__merge_strategy = merge_strategy
         self.__pre_processors = pre_processors
-        self.__max_ingest_chunk_size = max_ingest_chunk_size
 
     @property
     def catalog_name(self) -> str:
@@ -60,10 +59,6 @@ class Dimension(ABC):
     @property
     def columns(self) -> Sequence[str]:
         return self.__columns
-
-    @property
-    def max_ingest_chunk_size(self) -> int | None:
-        return self.__max_ingest_chunk_size
 
     def count(self) -> int:
         with self._con.cursor() as cursor:
@@ -123,16 +118,9 @@ from batch;
             curs.execute(q)
 
     def __stage(self, batch: Table):
-        data = batch
-        if self.max_ingest_chunk_size:
-            data = batch.to_reader(self.max_ingest_chunk_size)
-        with self._con.cursor() as cursor:
-            cursor.adbc_ingest(
-                table_name=self.staging_table_name,
-                data=data,
-                mode="replace",
-                temporary=True,
-            )
+        utils.flight_sql_ingest(
+            self._con, self.staging_table_name, batch, mode="replace", temporary=True
+        )
         # The below should be a temporary fix to GizmoSQL adbc driver ingesting geometry columns as blob
         self.__cast_geometry_columns(self._con, self.staging_table_name)
 
