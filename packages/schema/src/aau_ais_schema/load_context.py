@@ -160,7 +160,7 @@ where load_id = ?;"""
             ).fetchall()
             self.__con.commit()
         logger.info(
-            "Load {} stopped in {:,.2f}s!",
+            "Load %s stopped in %.2fs!",
             self.load_id,
             time.perf_counter() - self.__start_time if self.__start_time else -1,
         )
