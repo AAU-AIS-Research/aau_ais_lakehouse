@@ -24,7 +24,11 @@
     "settings": {
         "files.exclude": {
             "packages/": true
-        }
+        },
+        "[python]": {
+            "editor.defaultFormatter": "charliermarsh.ruff",
+            "editor.formatOnSave": true,
+        },
     },
     "extensions": {
         "recommendations": [

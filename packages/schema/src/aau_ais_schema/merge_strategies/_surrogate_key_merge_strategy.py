@@ -21,11 +21,20 @@ class SurrogateKeyMergeStrategy:
     """
 
     def __init__(
-        self, surrogate_key: str, keys: Sequence[str], attributes: Sequence[str] = []
+        self,
+        sequence: str,
+        surrogate_key: str,
+        keys: Sequence[str],
+        attributes: Sequence[str] = [],
     ):
+        self.__sequence = sequence
         self.__surrogate_key = surrogate_key
         self.__keys = keys
         self.__attributes = attributes
+
+    @property
+    def sequence(self) -> str:
+        return self.__sequence
 
     @property
     def surrogate_key(self) -> str:
@@ -41,16 +50,29 @@ class SurrogateKeyMergeStrategy:
 
     def __merge(self, con: Connection, src_tbl: str, dst_tbl: str) -> None:
         template_str = """--sql
-merge into {{dst_tbl}} as dst
-    using {{src_tbl}} as src
-    on (
-        {%- for key in keys %}
-        {% if not loop.first %}and {% endif %}dst.{{key}} is not distinct from src.{{key}}
-        {%- endfor %}
-    )
-    when not matched then 
-        insert ({{surrogate_key}}, {{(keys + attributes) | join(', ')}})
-        values (DEFAULT, {{(keys + attributes) | map('replace', '', 'src.', 1) | join(', ')}});
+-- Join existing surrogate keys into staging table
+create or replace temporary table {{src_tbl}} as
+    select dst.{{surrogate_key}}, *
+    from {{src_tbl}} as src
+        left join {{dst_tbl}} as dst on (
+            {%- for key in keys %}
+            {% if not loop.first %}and {% endif %}dst.{{key}} is not distinct from src.{{key}}
+            {%- endfor %}
+        );
+
+-- Insert new rows into destination table
+insert into {{dst_tbl}} ({{surrogate_key}}, {{(keys + attributes) | join(', ')}})
+    select
+        nextval('{{sequence}}') as {{surrogate_key}},
+        {{(keys + attributes) | join(', ')}}
+    from {{src_tbl}}
+    where {{surrogate_key}} is null;
+
+-- Update staging table with newly inserted surrogate keys
+update {{src_tbl}} as src
+    set {{surrogate_key}} = dst.{{surrogate_key}}
+    from {{dst_tbl}} as dst
+    where src.{{surrogate_key}} is null;
 """
         q = Template(template_str).render(
             src_tbl=src_tbl,
@@ -58,6 +80,7 @@ merge into {{dst_tbl}} as dst
             surrogate_key=self.surrogate_key,
             keys=self.keys,
             attributes=self.attributes,
+            sequence=self.sequence,
         )
 
         with con.cursor() as curs:
@@ -66,15 +89,11 @@ merge into {{dst_tbl}} as dst
     def __fetch(self, con: Connection, src_tbl: str, dst_tbl: str) -> Table:
         template_str = """--sql
 select distinct
-    r.{{surrogate_key}}
+    {{surrogate_key}}
     {%- for key in keys %}
-    ,l.{{key}}
+    ,{{key}}
     {%- endfor %}
-from {{src_tbl}} as l
-    inner join {{dst_tbl}} as r on
-        {%- for key in keys %}
-        {% if not loop.first %}and {% endif %}l.{{key}} is not distinct from r.{{key}}
-        {%- endfor %};
+from {{src_tbl}};
 """
         q = Template(template_str).render(
             src_tbl=src_tbl,

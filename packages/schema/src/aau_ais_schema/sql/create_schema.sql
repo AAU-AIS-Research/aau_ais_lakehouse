@@ -206,7 +206,7 @@ create or replace macro grid_id_to_wgs84_envelope(grid_id, cell_width, cell_heig
 --#region Dimensions
 --------------------------------------------------------------------------------------
 -- Load dimension
-create sequence if not exists dim.load_dim_load_id_seq;
+create sequence if not exists dim.load_dim_load_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.load_dim(
     load_id         uinteger        primary key default nextval('dim.load_dim_load_id_seq'),
     src_id          varchar(100)    not null,
@@ -264,7 +264,7 @@ create table if not exists dim.country_dim(
 insert or ignore into dim.country_dim values ('??', '???', 'unknown', 0, null, null, null, null, null, null);
 
 -- Vessel dimension
-create sequence if not exists dim.vessel_dim_vessel_id_seq;
+create sequence if not exists dim.vessel_dim_vessel_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.vessel_dim(
     vessel_id           uinteger    primary key default nextval('dim.vessel_dim_vessel_id_seq'),
     mmsi                uinteger    not null,
@@ -278,7 +278,7 @@ create table if not exists dim.vessel_dim(
 );
 
 -- Vessel configuration dimension
-create sequence if not exists dim.vessel_config_dim_vessel_config_id_seq;
+create sequence if not exists dim.vessel_config_dim_vessel_config_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.vessel_config_dim(
     vessel_config_id    uinteger    primary key default nextval('dim.vessel_config_dim_vessel_config_id_seq'),
     length              float,
@@ -297,7 +297,7 @@ create table if not exists dim.vessel_config_dim(
 );
 
 -- Depth cell dimension
-create sequence if not exists dim.depth_grid_dim_depth_cell_id_seq;
+create sequence if not exists dim.depth_grid_dim_depth_cell_id_seq start with 1;
 create table if not exists dim.depth_grid_dim(
     depth_cell_id   ubigint     primary key default nextval('dim.depth_grid_dim_depth_cell_id_seq'),
     x               uinteger    not null,
@@ -314,14 +314,14 @@ insert or ignore into dim.depth_grid_dim(x, y, depth, geom) values
     (getvariable('max_uint'), getvariable('max_uint'), 0, 'POLYGON EMPTY');
 
 -- Half-degree grid dimension
-create sequence if not exists dim.half_degree_grid_dim_half_degree_cell_id_seq;
+create sequence if not exists dim.half_degree_grid_dim_half_degree_cell_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.half_degree_grid_dim(
     half_degree_cell_id uinteger    primary key default nextval('dim.half_degree_grid_dim_half_degree_cell_id_seq'),
     gst_cell_id         varchar(5)
 );
 
 -- Transponder type dimension
-create sequence if not exists dim.transponder_type_dim_transponder_type_id_seq;
+create sequence if not exists dim.transponder_type_dim_transponder_type_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.transponder_type_dim(
     transponder_type_id usmallint   primary key default nextval('dim.transponder_type_dim_transponder_type_id_seq'),
     transponder_type    varchar(29) not null unique
@@ -329,7 +329,7 @@ create table if not exists dim.transponder_type_dim(
 insert or ignore into dim.transponder_type_dim(transponder_type) values ('unknown');
 
 -- Vessel type dimension
-create sequence if not exists dim.vessel_type_dim_vessel_type_id_seq;
+create sequence if not exists dim.vessel_type_dim_vessel_type_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.vessel_type_dim(
     vessel_type_id     usmallint    primary key default nextval('dim.vessel_type_dim_vessel_type_id_seq'),
     vessel_type        varchar(250) not null unique
@@ -337,7 +337,7 @@ create table if not exists dim.vessel_type_dim(
 insert or ignore into dim.vessel_type_dim(vessel_type) values ('unknown');
 
 -- Vessel name dimension
-create sequence if not exists dim.vessel_name_dim_vessel_name_id_seq;
+create sequence if not exists dim.vessel_name_dim_vessel_name_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.vessel_name_dim(
     vessel_name_id  uinteger        primary key default nextval('dim.vessel_name_dim_vessel_name_id_seq'),
     vessel_name     varchar(250)    not null unique
@@ -345,7 +345,7 @@ create table if not exists dim.vessel_name_dim(
 insert or ignore into dim.vessel_name_dim(vessel_name) values ('UNKNOWN');
 
 -- Vessel positioning type dimension
-create sequence if not exists dim.pos_type_dim_pos_type_id_seq;
+create sequence if not exists dim.pos_type_dim_pos_type_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.pos_type_dim(
     pos_type_id usmallint       primary key default nextval('dim.pos_type_dim_pos_type_id_seq'),
     pos_type    varchar(250)    not null unique
@@ -353,7 +353,7 @@ create table if not exists dim.pos_type_dim(
 insert or ignore into dim.pos_type_dim(pos_type) values ('unknown');
 
 -- Vessel cargo type dimension
-create sequence if not exists dim.cargo_type_dim_cargo_type_id_seq;
+create sequence if not exists dim.cargo_type_dim_cargo_type_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.cargo_type_dim(
     cargo_type_id   usmallint   primary key default nextval('dim.cargo_type_dim_cargo_type_id_seq'),
     cargo_type      varchar(50) not null unique
@@ -361,7 +361,7 @@ create table if not exists dim.cargo_type_dim(
 insert or ignore into dim.cargo_type_dim(cargo_type) values ('unknown');
 
 -- Vessel call-sign dimension
-create sequence if not exists dim.call_sign_dim_call_sign_id_seq;
+create sequence if not exists dim.call_sign_dim_call_sign_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.call_sign_dim(
     call_sign_id    uinteger        primary key default nextval('dim.call_sign_dim_call_sign_id_seq'),
     call_sign       varchar(250)    not null unique
@@ -369,7 +369,7 @@ create table if not exists dim.call_sign_dim(
 insert or ignore into dim.call_sign_dim(call_sign) values ('UNKNOWN');
 
 -- Vessel destination dimension
-create sequence if not exists dim.destination_dim_destination_id_seq;
+create sequence if not exists dim.destination_dim_destination_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.destination_dim(
     destination_id  uinteger    primary key default nextval('dim.destination_dim_destination_id_seq'),
     org_msg         text        unique          not null
@@ -377,7 +377,7 @@ create table if not exists dim.destination_dim(
 insert or ignore into dim.destination_dim(org_msg) values ('unknown');
 
 -- Navigation status dimension
-create sequence if not exists dim.nav_status_dim_nav_status_id_seq;
+create sequence if not exists dim.nav_status_dim_nav_status_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.nav_status_dim(
     nav_status_id   usmallint       primary key default nextval('dim.nav_status_dim_nav_status_id_seq'),
     nav_status      varchar(250)    not null unique
@@ -385,7 +385,7 @@ create table if not exists dim.nav_status_dim(
 insert or ignore into dim.nav_status_dim(nav_status) values ('unknown');
 
 -- The categories of sub-parts of an AIS sequence from a vessel
-create sequence if not exists dim.traj_type_dim_traj_type_id_seq;
+create sequence if not exists dim.traj_type_dim_traj_type_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.traj_type_dim(
     traj_type_id  usmallint   primary key default nextval('dim.traj_type_dim_traj_type_id_seq'),
     traj_type     varchar(10) not null unique
@@ -395,7 +395,7 @@ insert or ignore into dim.traj_type_dim(traj_type) values
     ('stationary'),
     ('outlier');
 
-create sequence if not exists dim.traj_state_change_dim_state_change_id_seq;
+create sequence if not exists dim.traj_state_change_dim_state_change_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.traj_state_change_dim(
     state_change_id usmallint   primary key default nextval('dim.traj_state_change_dim_state_change_id_seq'),
     state_change    varchar(10) not null unique
@@ -411,7 +411,7 @@ insert or ignore into dim.traj_state_change_dim(state_change) values
     ('starting');
 
 -- Trajectory geometry dimension
-create sequence if not exists dim.traj_geom_dim_geom_id_seq;
+create sequence if not exists dim.traj_geom_dim_geom_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.traj_geom_dim(
     geom_id                 uinteger    primary key default nextval('dim.traj_geom_dim_geom_id_seq'),
     geom                    geometry    not null,           
@@ -428,7 +428,7 @@ create table if not exists dim.traj_geom_dim(
 );
 
 -- Where the linestrings stops are stored
-create sequence if not exists dim.stop_geom_dim_geom_id_seq;
+create sequence if not exists dim.stop_geom_dim_geom_id_seq start with 1 maxvalue 4_294_967_295;
 create table if not exists dim.stop_geom_dim(
     geom_id                 uinteger    primary key default nextval('dim.stop_geom_dim_geom_id_seq'),
     geom                    geometry    not null,

@@ -1,7 +1,7 @@
 [project]
 name = "aau-ais-schema"
-version = "1.0.0"
-description = "Add your description here"
+version = "1.0.1"
+description = "This is the schema package for the AAU AIS project"
 readme = "README.md"
 authors = [{ name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk" }]
 requires-python = ">=3.12"

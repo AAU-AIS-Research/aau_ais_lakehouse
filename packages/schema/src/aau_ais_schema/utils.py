@@ -7,6 +7,16 @@ from loguru import logger
 from pyarrow import Table
 
 
+def generate_sequence_name(
+    schema_name: str,
+    table_name: str,
+    surrogate_key_name: str,
+    prefix: str = "",
+    postfix: str = "_seq",
+) -> str:
+    return f"{schema_name}.{prefix}{table_name}_{surrogate_key_name}{postfix}"
+
+
 def flight_sql_ingest(
     con: Connection,
     table_name: str,
