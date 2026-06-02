@@ -29,7 +29,7 @@ dev = [
 
 [[package]]
 name = "aau-ais-schema"
-version = "1.0.1"
+version = "1.0.2"
 source = { editable = "." }
 dependencies = [
     { name = "aau-ais-core" },

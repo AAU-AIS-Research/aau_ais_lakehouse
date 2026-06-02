@@ -39,8 +39,7 @@ def flight_sql_ingest(
             "WITH_MAX_MSG_SIZE",
             max_msg_bytes,
         )
-
-    size = data.nbytes
+    size = data.get_total_buffer_size()
     splits = math.ceil(size / max_msg_bytes)
     max_chunk_size = math.floor(len(data) / splits)
     reader = data.to_reader(max_chunk_size)
