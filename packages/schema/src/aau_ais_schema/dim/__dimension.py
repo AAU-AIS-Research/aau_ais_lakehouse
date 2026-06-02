@@ -1,3 +1,4 @@
+import logging
 import time
 from abc import ABC
 from collections.abc import Sequence
@@ -7,11 +8,12 @@ import duckdb
 from aau_ais_core import duckdb_utils
 from adbc_driver_manager.dbapi import Connection
 from jinja2 import Template
-from loguru import logger
 from pyarrow import Table
 
 from aau_ais_schema import utils
 from aau_ais_schema.merge_strategies import MergeStrategy
+
+logger = logging.getLogger(__name__)
 
 Processor = Callable[[Table, dict[str, str]], Table]
 

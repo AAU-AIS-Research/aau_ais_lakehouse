@@ -1,9 +1,11 @@
+import logging
 import time
 
 from adbc_driver_manager.dbapi import Connection
-from loguru import logger
 
 from aau_ais_schema.exceptions import LoadError
+
+logger = logging.getLogger(__name__)
 
 
 class _LoadContext:

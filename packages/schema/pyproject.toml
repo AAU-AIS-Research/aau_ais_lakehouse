@@ -9,7 +9,6 @@ dependencies = [
     "adbc-driver-manager==1.11.*",
     "duckdb==1.5.*",
     "jinja2==3.*",
-    "loguru==0.7.*",
     "pyarrow>=23",
     "aau-ais-core"
 ]

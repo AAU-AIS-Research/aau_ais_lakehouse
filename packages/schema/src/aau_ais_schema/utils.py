@@ -1,10 +1,12 @@
+import logging
 import math
 from typing import Literal
 
 from adbc_driver_flightsql import DatabaseOptions
 from adbc_driver_flightsql.dbapi import Connection
-from loguru import logger
 from pyarrow import Table
+
+logger = logging.getLogger(__name__)
 
 
 def generate_sequence_name(

@@ -1,3 +1,5 @@
+import logging
+
 import duckdb
 from aau_ais_schema import LoadContext
 from aau_ais_schema.dim import (
@@ -21,10 +23,11 @@ from aau_ais_schema.dim import (
     VesselTypeDim,
 )
 from adbc_driver_manager.dbapi import Connection
-from loguru import logger
 from pyarrow import Table
 
 from aau_ais_traj import JINJA_ENV
+
+logger = logging.getLogger(__name__)
 
 
 def __get_max_fact_id(dst_con: Connection) -> int:
