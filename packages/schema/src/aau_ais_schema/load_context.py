@@ -133,7 +133,7 @@ returning load_id;
                 raise LoadError(f'Source: "{self.__src_id}" has already been loaded')
             self.__load_id = self.__register()
             self.__con.commit()
-            logger.info("Load {} started!", self.load_id)
+            logger.info("Load %s started!", self.load_id)
         except Exception as e:
             self.__roleback()
             raise e

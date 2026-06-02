@@ -132,7 +132,7 @@ from batch;
         name_map: dict[str, str] = {},
     ) -> Table:
         printable_tbl_name = self.table.replace('"', "")
-        logger.info("Loading {}...", printable_tbl_name)
+        logger.info("Loading %s...", printable_tbl_name)
         start_cnt = self.count()
         s = time.perf_counter()
 
@@ -151,7 +151,7 @@ from batch;
         end_cnt = self.count()
 
         logger.info(
-            "Inserted {:,} row(s) into {} in {:,.2f}s",
+            "Inserted %d row(s) into %s in %.2fs",
             end_cnt - start_cnt,
             printable_tbl_name,
             time.perf_counter() - s,

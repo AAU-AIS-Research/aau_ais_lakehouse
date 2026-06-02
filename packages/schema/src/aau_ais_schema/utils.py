@@ -35,7 +35,7 @@ def flight_sql_ingest(
     except Exception:
         max_msg_bytes = 16 * 1024 * 1024
         logger.debug(
-            "{} not set, defaulting to Flight SQL default: {}",
+            "%s not set, defaulting to Flight SQL default: %d bytes",
             "WITH_MAX_MSG_SIZE",
             max_msg_bytes,
         )
