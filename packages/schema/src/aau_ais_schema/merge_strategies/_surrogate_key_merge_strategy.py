@@ -68,6 +68,7 @@ insert into {{dst_tbl}} ({{surrogate_key}}, {{(keys + attributes) | join(', ')}}
     from {{src_tbl}}
     where {{surrogate_key}} is null;
 
+-- Join new surrogate keys into staging table
 create or replace temporary table {{src_tbl}} as
     select dst.{{surrogate_key}}, *
     from {{src_tbl}} as src
@@ -76,12 +77,6 @@ create or replace temporary table {{src_tbl}} as
             {% if not loop.first %}and {% endif %}dst.{{key}} is not distinct from src.{{key}}
             {%- endfor %}
         );
-
--- Update staging table with newly inserted surrogate keys
---update {{src_tbl}} as src
---    set {{surrogate_key}} = dst.{{surrogate_key}}
---    from {{dst_tbl}} as dst
---    where src.{{surrogate_key}} is null;
 """
         q = Template(template_str).render(
             src_tbl=src_tbl,
