@@ -42,6 +42,19 @@ def flight_sql_ingest(
     size = data.get_total_buffer_size()
     splits = math.ceil(size / max_msg_bytes)
     max_chunk_size = math.floor(len(data) / splits)
+
+    if size > max_msg_bytes:
+        logger.info(
+            "Batch size (%s bytes) larger than maximum allowed message size (%s bytes)",
+            size,
+            max_msg_bytes,
+        )
+    if splits > 1:
+        logger.info(
+            "Splitting data into %d chunks of approximately %.2f bytes each",
+            splits,
+            size // splits,
+        )
     reader = data.to_reader(max_chunk_size)
 
     with con.cursor() as cursor:
