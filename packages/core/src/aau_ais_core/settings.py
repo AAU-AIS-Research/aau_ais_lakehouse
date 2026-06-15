@@ -24,12 +24,7 @@ class GizmoSqlConnectionSettings(BaseModel):
 
     @property
     def db_kwargs(self):
-        params = self.extra_db_params or {}
-        credentials = {
-            "username": self.user,
-            "password": self.password.get_secret_value(),
-        }
-        return {**credentials, **params}
+        return self.extra_db_params or {}
 
     def connect(self, autocommit: bool = False) -> Connection:
         return dbapi.connect(
@@ -37,6 +32,7 @@ class GizmoSqlConnectionSettings(BaseModel):
             username=self.user,
             password=self.password.get_secret_value(),
             tls_skip_verify=self.skip_tls_verify,
+            db_kwargs=self.extra_db_params,
             autocommit=autocommit,
         )
 
