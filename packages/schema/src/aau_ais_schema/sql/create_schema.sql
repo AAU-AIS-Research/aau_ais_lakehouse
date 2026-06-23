@@ -607,3 +607,39 @@ create table if not exists lakehouse.fact.ais_stop_fact(
 );
 --#endregion
 --------------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------
+--#region Views
+--------------------------------------------------------------------------------------
+create or replace view lakehouse.main.vessel_activity as
+    select
+        mmsi,
+        'in motion' as traj_type,
+        fact.* exclude (
+            ais_traj_id,
+            load_id,
+            geom_id
+        ),
+        geom
+    from lakehouse.fact.ais_traj_fact as fact
+        inner join ais.dim.vessel_dim using (vessel_id)
+        inner join ais.dim.traj_geom_dim using (geom_id)
+
+    union
+
+    select
+        mmsi,
+        'stationary' as traj_type,
+        fact.* exclude (
+            ais_stop_id,
+            load_id,
+            geom_id
+        ),
+        geom
+    from lakehouse.fact.ais_stop_fact as fact
+        inner join ais.dim.vessel_dim using (vessel_id)
+        inner join ais.dim.stop_geom_dim using (geom_id);
+
+--#endregion
+--------------------------------------------------------------------------------------
