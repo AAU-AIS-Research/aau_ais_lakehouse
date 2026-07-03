@@ -201,6 +201,10 @@ create or replace macro grid_id_to_wgs84_envelope(grid_id, cell_width, cell_heig
     select ST_MakeEnvelope(coord.x, coord.y, coord.x + cell_width, coord.y + cell_height)
     from variable
 );
+
+create or replace macro datetime_keys_to_timestamp(date_id, time_id) as (
+    select strptime(date_id::text || lpad(time_id::text, 6, '0'), '%Y%m%d%H%M%S')
+);
 --#endregion
 --------------------------------------------------------------------------------------
 --#region Dimensions
