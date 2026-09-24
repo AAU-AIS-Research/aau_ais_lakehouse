@@ -18,13 +18,18 @@ def create(ctx: AISContext):
         settings.gizmosql.connect(autocommit=True) as con,
         con.cursor() as cur,
     ):
-        q = (
-            resources.files("aau_ais_schema")
-            .joinpath("sql", "create_schema.sql")
-            .read_text()
+        files = (
+            file
+            for file in resources.files("aau_ais_schema")
+            .joinpath("sql", "migrations")
+            .iterdir()
+            if file.name.startswith("v")
         )
-        print("[green]Creating lakehouse schema[/green]...")
-        cur.execute(q)
+
+        for migration in sorted(files, key=lambda f: f.name):
+            cur.execute(migration.read_text())
+            print(f"[green]Migration {migration.name} done[/green]...")
+
     print("[green]Lakehouse schema created successfully.[/green]")
 
 
@@ -40,13 +45,17 @@ def drop(ctx: AISContext):
             "Are you sure you want to drop the database? All data will be lost!",
             abort=True,
         )
-        q = (
-            resources.files("aau_ais_schema")
-            .joinpath("sql", "drop_schema.sql")
-            .read_text()
+
+        files = (
+            file
+            for file in resources.files("aau_ais_schema")
+            .joinpath("sql", "migrations")
+            .iterdir()
+            if file.name.startswith("u")
         )
-        print("[red]Dropping lakehouse schema[/red]...")
-        cur.execute(q)
+        for migration in sorted(files, key=lambda f: f.name, reverse=True):
+            cur.execute(migration.read_text())
+            print(f"[red]Migration {migration.name} done[/red]...")
     print("[green]Lakehouse schema dropped successfully.[/green]")
 
 

@@ -450,6 +450,9 @@ create table if not exists dim.stop_geom_dim(
     check (ST_GeometryType(geom) = 'LINESTRING')
 );
 
+
+
+
 --#endregion
 --------------------------------------------------------------------------------------
 --#region Facts
@@ -613,6 +616,9 @@ create table if not exists lakehouse.fact.ais_stop_fact(
     dist_meter_prev_obj     uinteger,
     dist_sec_prev_obj       uinteger
 );
+
+
+
 --#endregion
 --------------------------------------------------------------------------------------
 
