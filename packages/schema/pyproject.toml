@@ -1,12 +1,12 @@
 [project]
 name = "aau-ais-schema"
-version = "1.1.0"
+version = "1.1.1"
 description = "This is the schema package for the AAU AIS project"
 readme = "README.md"
 authors = [{ name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk" }]
 requires-python = ">=3.12"
 dependencies = [
-    "adbc-driver-manager==1.11.*",
+    "adbc-driver-manager>=1.12.0",
     "duckdb==1.5.*",
     "jinja2==3.*",
     "pyarrow>=23",

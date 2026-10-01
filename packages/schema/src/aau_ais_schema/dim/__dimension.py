@@ -1,8 +1,7 @@
 import logging
 import time
 from abc import ABC
-from collections.abc import Sequence
-from typing import Callable
+from collections.abc import Callable, Sequence
 
 import duckdb
 from aau_ais_core import duckdb_utils
@@ -124,7 +123,7 @@ from batch;
             self._con, self.staging_table_name, batch, mode="replace", temporary=True
         )
         # The below should be a temporary fix to GizmoSQL adbc driver ingesting geometry columns as blob
-        self.__cast_geometry_columns(self._con, self.staging_table_name)
+        # self.__cast_geometry_columns(self._con, self.staging_table_name)
 
     def load(
         self,

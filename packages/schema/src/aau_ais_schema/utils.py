@@ -2,8 +2,7 @@ import logging
 import math
 from typing import Literal
 
-from adbc_driver_flightsql import DatabaseOptions
-from adbc_driver_flightsql.dbapi import Connection
+from adbc_driver_manager.dbapi import Connection
 from pyarrow import Table
 
 logger = logging.getLogger(__name__)
@@ -30,7 +29,7 @@ def flight_sql_ingest(
 ):
     try:
         max_msg_bytes = con.adbc_database.get_option_int(
-            DatabaseOptions.WITH_MAX_MSG_SIZE.value
+            "adbc.flight.sql.client_option.with_max_msg_size"
         )
     except Exception:
         max_msg_bytes = 16 * 1024 * 1024
