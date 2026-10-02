@@ -170,4 +170,9 @@ create or replace macro time_id_to_timestamp(time_id) as
     con.execute(q)
 
 
-#
+def create_temporal_id_to_timestamp(con: DuckDBPyConnection) -> None:
+    q = """
+create or replace macro temporal_id_to_timestamp(date_id, time_id) as 
+    strptime(lpad(date_id::text, 8, '0') || ' ' || lpad(time_id::text, 6, '0'), '%Y%m%d %H%M%S');
+"""
+    con.execute(q)

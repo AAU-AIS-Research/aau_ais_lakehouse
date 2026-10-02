@@ -8,7 +8,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "adbc-driver-gizmosql==1.1.*",
+    "adbc-driver-gizmosql==2.0.*",
     "duckdb==1.5.*",
     "pyarrow>=22.0.0",
     "pydantic-settings==2.*",

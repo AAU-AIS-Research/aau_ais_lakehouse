@@ -107,6 +107,4 @@ def is_traj_file(file: Path):
     ).fetchall()
     file_columns = {c[0] for c in file_columns}
 
-    if TRAJ_FILE_COLUMNS.issubset(file_columns):
-        return True
-    return False
+    return TRAJ_FILE_COLUMNS.issubset(file_columns)

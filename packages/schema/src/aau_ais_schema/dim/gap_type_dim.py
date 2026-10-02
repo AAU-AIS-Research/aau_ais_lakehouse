@@ -1,30 +1,32 @@
 from adbc_driver_manager.dbapi import Connection
 
-from aau_ais_schema import utils
 from aau_ais_schema.dim.__dimension import Dimension, Processor
 from aau_ais_schema.merge_strategies import SurrogateKeyMergeStrategy
 
 
-class TrajStateChangeDim(Dimension):
+class GapTypeDim(Dimension):
     def __init__(
         self,
         con: Connection,
         catalog_name: str = "ais",
         schema_name: str = "dim",
-        table_name: str = "traj_state_change_dim",
+        table_name: str = "gap_type_dim",
         pre_processors: list[Processor] = [],
     ):
-        surrogate = "state_change_id"
-        keys = ["state_change"]
+        surrogate = "gap_type_id"
+        keys = ["short_name"]
+        attributes = ["long_name", "dsc"]
 
-        sequence = utils.generate_sequence_name(schema_name, table_name, surrogate)
-        merge_strategy = SurrogateKeyMergeStrategy(sequence, surrogate, keys)
+        sequence = f"{schema_name}.{table_name}_seq"
+        merge_strategy = SurrogateKeyMergeStrategy(
+            sequence, surrogate, keys, attributes
+        )
         super().__init__(
             con,
             catalog_name,
             schema_name,
             table_name,
-            columns=keys,
+            columns=keys + attributes,
             merge_strategy=merge_strategy,
             pre_processors=pre_processors,
         )

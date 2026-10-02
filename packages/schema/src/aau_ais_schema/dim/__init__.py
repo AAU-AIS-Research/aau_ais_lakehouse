@@ -8,6 +8,7 @@ from .cargo_type_dim import CargoTypeDim
 from .country_dim import CountryDim
 from .date_dim import DateDim, DateIdExpander
 from .destination_dim import DestinationDim
+from .gap_type_dim import GapTypeDim
 from .nav_status_dim import NavStatusDim
 from .pos_type_dim import PosTypeDim
 from .stop_geom_dim import StopGeomDim, StopGeomFieldExpander

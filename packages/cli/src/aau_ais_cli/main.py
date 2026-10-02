@@ -1,13 +1,7 @@
-import sys
-
-from loguru import logger
 from typer import Context, Typer
 
 from aau_ais_cli import db, dev, traj
 from aau_ais_cli.settings import Settings
-
-logger.remove()
-logger.add(sys.stdout, level="INFO")
 
 app = Typer()
 app.add_typer(
