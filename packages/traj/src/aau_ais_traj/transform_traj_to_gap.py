@@ -73,6 +73,7 @@ def __generate_vessel_track_gaps(con: DuckDBPyConnection) -> Table:
 with gap as (
     select 
         mmsi,
+        imo,
         transponder_type,
         vessel_type,
         alpha2,
@@ -89,7 +90,7 @@ with gap as (
         state_change
     from tracks
     where type != 'outlier'
-    window w as (partition by mmsi order by start_ts, end_ts desc)
+    window w as (partition by mmsi, imo order by start_ts, end_ts desc)
     order by start_ts, end_ts
 )
 select
@@ -111,23 +112,3 @@ def transform(data: Table) -> Table:
     with __setup_connection() as con:
         __store_data(con, data)
         return __generate_vessel_track_gaps(con)
-
-        mmsi_list = __get__distinct_mmsi(con)
-
-        for mmsi in mmsi_list:
-            logger.debug("Creating gaps for MMSI: %s", mmsi)
-            res_tbl = __generate_vessel_track_gaps(con, mmsi)
-            q = """
-            create sequence if not exists result_seq start with 1;
-            create table if not exists result as 
-                from res_tbl
-                with no data;
-            alter table if exists result add column if not exists id int;
-            
-            
-            insert into result by name
-                select nextval('result_seq') as id, *
-                from res_tbl;
-            """
-            con.execute(q)
-        return con.table("result").to_arrow_table()
