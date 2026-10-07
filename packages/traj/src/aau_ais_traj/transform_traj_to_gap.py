@@ -93,6 +93,7 @@ with gap as (
     order by start_ts, end_ts
 )
 select
+    row_number() over ()                                                    as id,
     (* exclude (stat_point, end_point, state_change)),
     ST_SetCRS(ST_MakeLine(stat_point, end_point), 'EPSG:4326')              as geom,
     epoch(end_ts - start_ts)                                                as seconds,
