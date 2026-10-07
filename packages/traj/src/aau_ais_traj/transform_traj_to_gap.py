@@ -68,7 +68,7 @@ def __get__distinct_mmsi(con: DuckDBPyConnection) -> list[int]:
     return [row[0] for row in con.query(q).fetchall()]
 
 
-def __generate_vessel_track_gaps(con: DuckDBPyConnection, mmsi: int) -> Table:
+def __generate_vessel_track_gaps(con: DuckDBPyConnection) -> Table:
     q = """
 with gap as (
     select 
@@ -88,8 +88,8 @@ with gap as (
         type                    as end_type,
         state_change
     from tracks
-    where type != 'outlier' and mmsi = ?
-    window w as (order by start_ts, end_ts)
+    where type != 'outlier'
+    window w as (partition by mmsi order by start_ts, end_ts desc)
     order by start_ts, end_ts
 )
 select
@@ -103,12 +103,14 @@ select
 from gap
 where geom is not null;
 """
-    return con.query(q, params=[mmsi]).to_arrow_table()
+    return con.query(q).to_arrow_table()
 
 
 def transform(data: Table) -> Table:
     with __setup_connection() as con:
         __store_data(con, data)
+        return __generate_vessel_track_gaps(con)
+
         mmsi_list = __get__distinct_mmsi(con)
 
         for mmsi in mmsi_list:
