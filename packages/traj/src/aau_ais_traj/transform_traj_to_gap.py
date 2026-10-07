@@ -112,7 +112,7 @@ def transform(data: Table) -> Table:
         mmsi_list = __get__distinct_mmsi(con)
 
         for mmsi in mmsi_list:
-            logger.info("Creating gaps for MMSI: %s", mmsi)
+            logger.debug("Creating gaps for MMSI: %s", mmsi)
             res_tbl = __generate_vessel_track_gaps(con, mmsi)
             q = """
             create sequence if not exists result_seq start with 1;
