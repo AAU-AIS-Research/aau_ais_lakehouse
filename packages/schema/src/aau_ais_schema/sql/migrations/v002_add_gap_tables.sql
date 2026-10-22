@@ -1,4 +1,25 @@
 --------------------------------------------------------------------------------------
+--#region Staging Tables
+--------------------------------------------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS staging;
+CREATE TABLE IF NOT EXISTS staging.cross_day_gap (
+    mmsi                UINTEGER                NOT NULL,
+    imo                 UINTEGER,
+    transponder_type    TEXT                    NOT NULL,
+    vessel_type         TEXT                    NOT NULL,
+    alpha2              CHAR(2)                 NOT NULL,
+    start_date_id       UINTEGER                NOT NULL,
+    end_date_id         UINTEGER                NOT NULL,
+    start_time_id       UINTEGER                NOT NULL,
+    end_time_id         UINTEGER                NOT NULL,
+    type                TEXT                    NOT NULL,
+    state_change        TEXT                    NOT NULL,
+    start_point         GEOMETRY('EPSG:4326')   NOT NULL,
+    end_point           GEOMETRY('EPSG:4326')   NOT NULL,
+    PRIMARY KEY (mmsi, start_date_id, start_time_id, end_date_id, end_time_id)
+);
+
+--------------------------------------------------------------------------------------
 --#region Dimensions
 --------------------------------------------------------------------------------------
 -- Gap Type Dimension

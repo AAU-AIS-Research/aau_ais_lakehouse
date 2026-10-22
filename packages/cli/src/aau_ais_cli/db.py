@@ -29,6 +29,7 @@ def create(ctx: AISContext):
         for migration in sorted(files, key=lambda f: f.name):
             cur.execute(migration.read_text())
             print(f"[green]Migration {migration.name} done[/green]...")
+        con.commit()
 
     print("[green]Lakehouse schema created successfully.[/green]")
 
