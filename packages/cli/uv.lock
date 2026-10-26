@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.13"
 
 [[package]]
@@ -31,10 +31,10 @@ dev = [{ name = "pyarrow-stubs", specifier = "==20.0.*" }]
 
 [[package]]
 name = "aau-ais-core"
-version = "1.0.1"
+version = "1.1.0"
 source = { editable = "../core" }
 dependencies = [
-    { name = "adbc-driver-gizmosql" },
+    { name = "adbc-driver-hardcharger" },
     { name = "duckdb" },
     { name = "pyarrow" },
     { name = "pydantic-settings" },
@@ -42,7 +42,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "adbc-driver-gizmosql", specifier = "==1.1.*" },
+    { name = "adbc-driver-hardcharger", specifier = "==2.0.*" },
     { name = "duckdb", specifier = "==1.5.*" },
     { name = "pyarrow", specifier = ">=22.0.0" },
     { name = "pydantic-settings", specifier = "==2.*" },
@@ -56,7 +56,7 @@ dev = [
 
 [[package]]
 name = "aau-ais-schema"
-version = "1.1.0"
+version = "1.2.2"
 source = { editable = "../schema" }
 dependencies = [
     { name = "aau-ais-core" },
@@ -69,7 +69,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aau-ais-core", editable = "../core" },
-    { name = "adbc-driver-manager", specifier = "==1.11.*" },
+    { name = "adbc-driver-manager", specifier = ">=1.12.0" },
     { name = "duckdb", specifier = "==1.5.*" },
     { name = "jinja2", specifier = "==3.*" },
     { name = "pyarrow", specifier = ">=23" },
@@ -80,7 +80,7 @@ dev = [{ name = "pyarrow-stubs", specifier = "==20.0.*" }]
 
 [[package]]
 name = "aau-ais-traj"
-version = "1.0.0"
+version = "1.1.2"
 source = { editable = "../traj" }
 dependencies = [
     { name = "aau-ais-schema" },
@@ -91,72 +91,88 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aau-ais-schema", editable = "../schema" },
-    { name = "adbc-driver-gizmosql", specifier = "==1.1.*" },
+    { name = "adbc-driver-gizmosql", specifier = "==2.0.*" },
     { name = "jinja2", specifier = "==3.*" },
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pyarrow-stubs", specifier = "==20.0.*" }]
-
-[[package]]
-name = "adbc-driver-flightsql"
-version = "1.12.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "adbc-driver-manager" },
-    { name = "importlib-resources" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/65/91/605b35b97aa5972a8026c0687e9996658d1d10ff7a0624173a0d0c7c5b93/adbc_driver_flightsql-1.12.0.tar.gz", hash = "sha256:300f67801ea016578e0c4bb798fc2b9024e405cfdd3f79fd77e37481a5767e45", size = 22097, upload-time = "2026-07-28T00:43:02.432Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/7a/a4/5ad52abf0c4830585b86d68cff8ce07779cdee9b8cf390dff0ee21a29fa7/adbc_driver_flightsql-1.12.0-py3-none-macosx_10_15_x86_64.whl", hash = "sha256:c2c7209407c180d9d0dd94846203f184ab91e116782585bf29cb968c2686ba75", size = 8146345, upload-time = "2026-07-28T00:41:22.824Z" },
-    { url = "https://files.pythonhosted.org/packages/61/36/49267a4fc8c07c066dd8c36b9c3d27265a4dc0fc478cb5acb7bd6a551d80/adbc_driver_flightsql-1.12.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:fb37efefceb7ceca64840c76c55e6280f3811b54dca305ec1781f9cc1a6da21e", size = 7552045, upload-time = "2026-07-28T00:41:27.147Z" },
-    { url = "https://files.pythonhosted.org/packages/2b/5b/f8566aa6d05eb40225f5874f8f5f5e8b8b4a4ce866d817a5ff352f326302/adbc_driver_flightsql-1.12.0-py3-none-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:69742e4f8fcc254490aa7f8e254a3b704c24bde9d5d827a0926ea90a6b4c3a6d", size = 14981635, upload-time = "2026-07-28T00:41:33.2Z" },
-    { url = "https://files.pythonhosted.org/packages/57/45/6468fb425f3c0ae868c1ca9ab8e15cba76b59e941edd7e80e892e5476728/adbc_driver_flightsql-1.12.0-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:9adfb5e46abc77347476d09ee76dfc835fef2b4dcb0c76d08d6d35aa3a4cce17", size = 13699634, upload-time = "2026-07-28T00:41:38.232Z" },
-    { url = "https://files.pythonhosted.org/packages/dc/c7/6773dedc54fad73277ee2d767dd817e203e949972b0cfb197df99e00b784/adbc_driver_flightsql-1.12.0-py3-none-win_amd64.whl", hash = "sha256:098f2498778fd3efd671fbeacba80987de98ebfeb0291da77fe0a26c6fa78532", size = 15033803, upload-time = "2026-07-28T00:41:42.483Z" },
+dev = [
+    { name = "pyarrow-stubs", specifier = "==20.0.*" },
+    { name = "pytest", specifier = "==9.1.*" },
 ]
 
 [[package]]
 name = "adbc-driver-gizmosql"
-version = "1.1.7"
+version = "2.0.15"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "adbc-driver-flightsql" },
     { name = "adbc-driver-manager" },
     { name = "pyarrow" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/63/e6/3e99a9b8069c3dd0f0a5adebdb5be6a2b2ef937a92c1dd51720c5a5b5476/adbc_driver_gizmosql-1.1.7.tar.gz", hash = "sha256:8b40dfb6be00a90333ba6d105feab625cfb3304b118a95e13a3b18672776f081", size = 29326, upload-time = "2026-05-10T20:28:48.613Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/81/72b243bf3f5c5059df3abe2bf9853f140c020c4ee74ad860f6617f930191/adbc_driver_gizmosql-1.1.7-py3-none-any.whl", hash = "sha256:2a25a637caed72281c5ecaa50f16e79209ca452df90980d3ec041933b61734d1", size = 18562, upload-time = "2026-05-10T20:28:46.879Z" },
+    { url = "https://files.pythonhosted.org/packages/3d/c3/d5db1abcea27640316d8bc8c5ef9a8e484141625869506576ba02516046a/adbc_driver_gizmosql-2.0.15-py3-none-macosx_11_0_universal2.whl", hash = "sha256:e2d0d1a9e27531c2b6b1802b4e91c247882b873ae128059a5d27c81cda36d512", size = 7731932, upload-time = "2026-10-15T15:32:07.645Z" },
+    { url = "https://files.pythonhosted.org/packages/59/81/c27222e2ca87c32fbd27fbf60dd34a7d6b8f998edfb50c22706570b9b7a2/adbc_driver_gizmosql-2.0.15-py3-none-macosx_11_0_x86_64.whl", hash = "sha256:4db0d79d338633c7851fd9201a13b5d2a348b1a80d5e18a315a0dc9fc7dd94be", size = 8364974, upload-time = "2026-10-15T15:32:09.478Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/c6/4657531cd20cfdbc009274afc9732260851923605b65dff14b204ef1db9f/adbc_driver_gizmosql-2.0.15-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:b4ab0ee877379a183dd57ada85ae597d145664fd820bd1f950bbf881b1efed33", size = 15145743, upload-time = "2026-10-15T15:32:11.565Z" },
+    { url = "https://files.pythonhosted.org/packages/69/d6/f0bce82c184b0cc210469037ef11bedf3d60eedeb5be8efe3720a1b7c394/adbc_driver_gizmosql-2.0.15-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:8a53915c959e91ed9a2d9a6460356cc0fd7af84d43a5cc397b11977a88958639", size = 13954800, upload-time = "2026-10-15T15:32:13.927Z" },
+    { url = "https://files.pythonhosted.org/packages/30/f0/ca80126114b838373d8c0446f354f0330551c42aa28a9aea24b18238c372/adbc_driver_gizmosql-2.0.15-py3-none-win_amd64.whl", hash = "sha256:1d689b38881d5161c733ecf05f1c94bf24fdaea94d4a361e855700088b78734e", size = 15081876, upload-time = "2026-10-15T15:32:16.144Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/d3/73cd364434e532cd8d7109bef0882c476a8cdeb0c8cc29f426c22d87913a/adbc_driver_gizmosql-2.0.15-py3-none-win_arm64.whl", hash = "sha256:a82135401501f8c4f632059e448249acf9db3d80e13dfec99b167d3d79df04fb", size = 13707197, upload-time = "2026-10-15T15:32:18.354Z" },
+]
+
+[[package]]
+name = "adbc-driver-hardcharger"
+version = "2.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adbc-driver-manager" },
+    { name = "pyarrow" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/76/0ca926bc54ba9f8329b36df3ba3a37e3c346f4f441792e5c151a322b8f14/adbc_driver_hardcharger-2.0.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:3f2a7a962f22f163c15092d1631ed805ca506a9e6f2e951237c03a0ade25b9b4", size = 9707835, upload-time = "2026-10-22T17:40:42.093Z" },
+    { url = "https://files.pythonhosted.org/packages/07/ff/7b255a9d2e2b1055caedffc905372f7138ca1186c0712c19967ef2f478dc/adbc_driver_hardcharger-2.0.2-py3-none-macosx_11_0_x86_64.whl", hash = "sha256:24016e4393d1119cd2de5c92c039568b69594cb3d3d528ada5be345040a2e891", size = 10984322, upload-time = "2026-10-22T17:40:44.651Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/cf/b85d31d9bbf4e294eb472ff96f7583109acc4928f9cb0e7abc73600e6445/adbc_driver_hardcharger-2.0.2-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:f82647c9f8af17909fac53544ad8d0a9300620af3cfe2d870e6f3e56b962b5fa", size = 12013569, upload-time = "2026-10-22T17:40:47.292Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/33/8cc96431ab91d63bc24c4a8869b2f4ffc0607c4434e3cba1bb761a3b0818/adbc_driver_hardcharger-2.0.2-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:c1e2336d72094f066c6b0171c0c8f903a863237bdde77fcd1e9967976dc66e3b", size = 10664206, upload-time = "2026-10-22T17:40:49.672Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/68/95462ec3e44889e1c84a6848fb82cc7904c6b83a4596d22444a8b2cc22e6/adbc_driver_hardcharger-2.0.2-py3-none-win_amd64.whl", hash = "sha256:0be881ede95526879eecefa62f047ca533aa78349616b1952c92a82ae2a57636", size = 11160137, upload-time = "2026-10-22T17:40:52.629Z" },
 ]
 
 [[package]]
 name = "adbc-driver-manager"
-version = "1.11.0"
+version = "1.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/5e/50aab18cb501e42d3aca3cd2cc26c6637094fcaf5b6576e350c444188f1f/adbc_driver_manager-1.11.0.tar.gz", hash = "sha256:c64aaabeb5810109ab3d2961008f1b014e9f2d87b3df4416c2a080a40237af50", size = 233059, upload-time = "2026-04-07T00:17:28.263Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/db/73/114b15fff653d53a5588826152e33b009c141edcd45678506f9cbdf06c19/adbc_driver_manager-1.13.0.tar.gz", hash = "sha256:72d616e43d03b735e4000b653307531a2d1820f1f7e0ce949656f0ab939bd53e", size = 220657, upload-time = "2026-10-26T06:33:35.816Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/a4/a5e1a49b88bc248a6489fd5221369aca0df06761b858af926e702f36abb7/adbc_driver_manager-1.11.0-cp313-cp313-macosx_10_15_x86_64.whl", hash = "sha256:300b07f4c1113b113e18dddcb9d96dd8b84f09fa35f8e4e3e8a2f112f291142c", size = 608355, upload-time = "2026-04-07T00:15:55.907Z" },
-    { url = "https://files.pythonhosted.org/packages/30/38/21bf51455d170199981462ecb8765153d1340dcff3f696910f44fe0535e5/adbc_driver_manager-1.11.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:f577be7c4730a43bae08f88105317d7e1d519d02a94aaa98da694358084a4735", size = 582871, upload-time = "2026-04-07T00:15:57.605Z" },
-    { url = "https://files.pythonhosted.org/packages/4c/aa/40bdf0f612bd88eb2fdad70e1cd3f88b8619a0ec66c312acd61170f61837/adbc_driver_manager-1.11.0-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:c980f81730752cdb98881357c238e87110e1810e4a69c7627c2211bd576b6230", size = 4670178, upload-time = "2026-04-07T00:15:59.516Z" },
-    { url = "https://files.pythonhosted.org/packages/ba/8c/8dcb40ed4f4ce3ccd1bda988e8d8bd37984ba223a339433d336502966697/adbc_driver_manager-1.11.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cbc93830500a2f0db7b32501a4f88678fac14b9a9921d94d919439a5b65099e6", size = 4746822, upload-time = "2026-04-07T00:16:02.437Z" },
-    { url = "https://files.pythonhosted.org/packages/07/b9/df5ac9db38ce4b683d19d94fb8a296d48306b1712d93f38ef25d7c36c253/adbc_driver_manager-1.11.0-cp313-cp313-win_amd64.whl", hash = "sha256:0c27cff12cdf074d9052bf8c4775ed1904053189a70497fa7b5746f0dbe326d8", size = 771492, upload-time = "2026-04-07T00:16:15.651Z" },
-    { url = "https://files.pythonhosted.org/packages/8f/af/4e050e6dbb0dfed99d631351bc47b6520d073529ac619bbecb5ad4adf015/adbc_driver_manager-1.11.0-cp313-cp313t-macosx_10_15_x86_64.whl", hash = "sha256:d8fdeb10ea464dce88feffe23f35cc37a44ac6bad4e90e793416a3c60afb354f", size = 625664, upload-time = "2026-04-07T00:16:04.311Z" },
-    { url = "https://files.pythonhosted.org/packages/47/f8/a009ecc7f889feb9cf3546bfb4e998ac88399eb06e2c75dd7d2972384bf7/adbc_driver_manager-1.11.0-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:cc565ed5d9f8c7974bbaff60c30c8330dae5a903592618a303291db4227b3d54", size = 603642, upload-time = "2026-04-07T00:16:06.758Z" },
-    { url = "https://files.pythonhosted.org/packages/53/c4/15af4bf5a3bfb76eead95a8cd5e1117098e64d046c3bb6eea0f502266523/adbc_driver_manager-1.11.0-cp313-cp313t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:9523ca4e8943aa7b43958762bc9d1cb0b5355cd84855359a91c54a4bae9a75df", size = 4733746, upload-time = "2026-04-07T00:16:09.5Z" },
-    { url = "https://files.pythonhosted.org/packages/40/72/dd76e63f8e787f2c313354e51152750f802061e21b4511e1bd9db467eca1/adbc_driver_manager-1.11.0-cp313-cp313t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:54dc142fc8065e13c6347fb3f2acb48430e3cab6863f27276a2b53594cc055b5", size = 4773869, upload-time = "2026-04-07T00:16:13.438Z" },
-    { url = "https://files.pythonhosted.org/packages/73/98/7a94f2aa7dbf470d4933a059bd66ee830fcea64422f95513dc9ab5fab910/adbc_driver_manager-1.11.0-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:f6fcd6fe4f82f8f2fc83948ed2b0b549d0831253d449f5734603cc03850e4f47", size = 609370, upload-time = "2026-04-07T00:16:18.336Z" },
-    { url = "https://files.pythonhosted.org/packages/fa/c3/bd62e3094a07bb5a3eebd4e185953df02e1b3582091872457899a1a12d74/adbc_driver_manager-1.11.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:4b4293fc88d0683b6ea9fe1b7d7498c5ae9b4f53a93369c760cfa753a22039c0", size = 585560, upload-time = "2026-04-07T00:16:20.566Z" },
-    { url = "https://files.pythonhosted.org/packages/19/6c/4aabac7ed4d5944f544b7cf7881d50fe4b34eac908605291b633a53be875/adbc_driver_manager-1.11.0-cp314-cp314-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:5a2d6d1971ce104e41e3969afee8d5782ebcb06bf496606aa4eed2005fbead43", size = 4668783, upload-time = "2026-04-07T00:16:23.798Z" },
-    { url = "https://files.pythonhosted.org/packages/47/67/3bf52e5ec427b0b88cbaa8e059b6c79851db0742db712a5f58a0e3f666be/adbc_driver_manager-1.11.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:24ef0e33bab3b0480e85d954f88664b578ea045efdc644681c5a487982818e5f", size = 4735326, upload-time = "2026-04-07T00:16:27.348Z" },
-    { url = "https://files.pythonhosted.org/packages/33/64/5247eb91f9902e7111bf7a75c1af4da7a1818e31a26a754d97d0f0df7dcb/adbc_driver_manager-1.11.0-cp314-cp314-win_amd64.whl", hash = "sha256:830efd3f212a6360ad66c09fd95171a26a1006a51c893f72238dfb50e0f35e13", size = 789628, upload-time = "2026-04-07T00:16:42.101Z" },
-    { url = "https://files.pythonhosted.org/packages/5f/57/9186febf1a550f7d8935aa9842bffbe3ff9848de2bdef066acd6a86f5bf8/adbc_driver_manager-1.11.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:b5e97d4cb3f5a798e18c802dd1f3d1bf7b77d763cdc707ac295907bf223d1ae8", size = 626086, upload-time = "2026-04-07T00:16:29.184Z" },
-    { url = "https://files.pythonhosted.org/packages/11/53/6e988bfbf8292cbf59b663e1e3ba6efe94f703c74061f8c0d2b182963899/adbc_driver_manager-1.11.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:2e4e155cae12667aa383750d879e177ada3ab0c351f8306d96e33fbe6949f6f4", size = 604608, upload-time = "2026-04-07T00:16:31.14Z" },
-    { url = "https://files.pythonhosted.org/packages/33/d6/e9cb77e9840b12382da49cc22a93c224d9607969b76b0062bf6114119f61/adbc_driver_manager-1.11.0-cp314-cp314t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:dfb736661f95eb8fc185a4b9951b2e61734633c7448e8d3d937e93ef1d9e5c08", size = 4738703, upload-time = "2026-04-07T00:16:34.416Z" },
-    { url = "https://files.pythonhosted.org/packages/c0/b3/c1b800c313e4e2cb7bec4a5334d4c89329eb021317c9fb3e3794a49e02d0/adbc_driver_manager-1.11.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e87a6f2b70baf21d3c52b280a17e2e8516197a4670b9a080a07dd255f2ab6e9d", size = 4778585, upload-time = "2026-04-07T00:16:37.775Z" },
-    { url = "https://files.pythonhosted.org/packages/04/3d/dc32f50d0ad1d748461422c7a6cad2a49b778aa4fdcbebe08e38789d7898/adbc_driver_manager-1.11.0-cp314-cp314t-win_amd64.whl", hash = "sha256:b853e613c6c8afbe7a3fcea0098c88b935a4d1e1b046813aed1fe7363c7b8fc7", size = 830178, upload-time = "2026-04-07T00:16:40.247Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/e5/710220a20b0966e20205fe18f5a45b69d98c6413e74546143c83abc33105/adbc_driver_manager-1.13.0-cp313-cp313-macosx_10_15_x86_64.whl", hash = "sha256:624bef3b9949e7038ff451ce3c08df20e0738da23c0d1037834c0ee4426ea305", size = 584189, upload-time = "2026-10-26T06:32:12.653Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/38/0b4ab4c4dad3de34a19c3fed0833a244355da8ee4800df00b271372051f5/adbc_driver_manager-1.13.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:c1420b860c87679757058bda49b64a56e7f61e968eb6568a853e1d52356d44b3", size = 596254, upload-time = "2026-10-26T06:32:14.194Z" },
+    { url = "https://files.pythonhosted.org/packages/97/11/5d732670417f9d8e2b3d201be366f6ed716041d490008a21469c1baf472e/adbc_driver_manager-1.13.0-cp313-cp313-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:82c90861896653c2cbc39f74f0261c0bb0c2862a2ceee60f29744df6e18da175", size = 4133894, upload-time = "2026-10-26T06:32:16.578Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/4f/e9098132e7892ba95582ab62880730ed3070a6d0218a04b56ef54a5211ae/adbc_driver_manager-1.13.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b81819bd35fb47b59757ab075041e326ec278ddaec33f75b6baadf11be1bc066", size = 4206979, upload-time = "2026-10-26T06:32:18.544Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/4f/726bf4db51fa2e9ac1407ea3c1468306a8c015746c5e04ec0687ff404127/adbc_driver_manager-1.13.0-cp313-cp313-win_amd64.whl", hash = "sha256:76f3addf8f4a25937b4d4dd3aa581b436c60c248123a094353d3293ee3405454", size = 744877, upload-time = "2026-10-26T06:32:20.232Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/33/33522fc3cfcc8072cd00d408b74375a06973420b0b24e49d754cabbbc637/adbc_driver_manager-1.13.0-cp313-cp313-win_arm64.whl", hash = "sha256:d7c8d9a07c99235475c68581cacaa03ee04b31d50440930321dde69c9d47a1bb", size = 897940, upload-time = "2026-10-26T06:32:21.792Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/d2/12972831ad00ba4c42c6b14bd009e196443ff98e9466c6239d41d68af05a/adbc_driver_manager-1.13.0-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:685cc3b2689a7f16f1c79f9423a6ec1694d1663cb0257aec2006546f294379ce", size = 584835, upload-time = "2026-10-26T06:32:23.914Z" },
+    { url = "https://files.pythonhosted.org/packages/47/a0/596e90687f39982443bb5353e68d5b483169423d5c25bd6d0463835ed59c/adbc_driver_manager-1.13.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:18f03c51b73ffcafe16d98fd537a6417df5171043147e59fc781373d2290ffa9", size = 597713, upload-time = "2026-10-26T06:32:25.426Z" },
+    { url = "https://files.pythonhosted.org/packages/07/dd/5363a6103751fa0ac644c0db1875b495e3297b9f15fa04fe5ce4cf2da1ed/adbc_driver_manager-1.13.0-cp314-cp314-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:7699696b6388fb7e0e69b84627a28bdfe988d144d45649102859a0f07aeb0223", size = 4131883, upload-time = "2026-10-26T06:32:28.05Z" },
+    { url = "https://files.pythonhosted.org/packages/2b/2c/1759a417eae4d90c390737eccf1098033779f2a8d6d8952d2f208cd236fd/adbc_driver_manager-1.13.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:3ce8256a35e68420fab5e19830b6051578828c7774f10500abae7edc61ec0d3a", size = 4190903, upload-time = "2026-10-26T06:32:30.221Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/22/96f0c65ff4c9417da9c7056cebc2e9b08768c9b26f0123896c7b2172c251/adbc_driver_manager-1.13.0-cp314-cp314-win_amd64.whl", hash = "sha256:5d1b71b6faa58ab970c67e6992eee0a0e617d1a2f35d1bd1095d6c4c4dea1e3b", size = 762138, upload-time = "2026-10-26T06:32:43.077Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/0a/1b53bb18f406f2c808b2c3757318f905d61901254c83071d3869648e0c3c/adbc_driver_manager-1.13.0-cp314-cp314-win_arm64.whl", hash = "sha256:051147056936bcec489c59c859162a4bf17cb6280efc5b75f63e70b2ac4250bf", size = 921713, upload-time = "2026-10-26T06:32:45.114Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/dc/7151b3fedcb5d1ae0301eb5c1389200616a42f3138d1d55f142603a4001b/adbc_driver_manager-1.13.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:487ae59fa53521dd040f78449032a92f460349a67c2daf3606a80c2410487d42", size = 603338, upload-time = "2026-10-26T06:32:31.9Z" },
+    { url = "https://files.pythonhosted.org/packages/13/e8/12db91dcc1b865d70556ba0b1a8128e850608612b3c7359b428e7118b177/adbc_driver_manager-1.13.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:ca595a044fabbb083d82c61c20ffea8614ac7568ed3d6978ac1c48f026e7789c", size = 616567, upload-time = "2026-10-26T06:32:33.49Z" },
+    { url = "https://files.pythonhosted.org/packages/f4/4a/60c6f39b9e66bf192efb3e2f593d8388bc056efd19288933494f7bc55a39/adbc_driver_manager-1.13.0-cp314-cp314t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:17a0552d198105dd15b39a93d20e8eda79916e747d74cd49868282f447c8a88f", size = 4198546, upload-time = "2026-10-26T06:32:36.122Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/69/d1796f2b18b4777b5571f102be9b7d9aa3371aa3253e8a67d79bb8d20d6c/adbc_driver_manager-1.13.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f851a4244edd2bf0fd33167cdb0d142963c089e53a720f42e550752b38c328c6", size = 4234979, upload-time = "2026-10-26T06:32:38.28Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/e4/4e5bcf48779f9ea999d20ed3b622ce4f2481c144ae86d7a2a15dc4c883b2/adbc_driver_manager-1.13.0-cp314-cp314t-win_amd64.whl", hash = "sha256:0cec917f7b46667e255842dc8d1f174125faac85951a7777527befd545fb4b6c", size = 778561, upload-time = "2026-10-26T06:32:39.835Z" },
+    { url = "https://files.pythonhosted.org/packages/68/9c/cdf0e92e23bb5cf8f24ad0ebaa771d6d4881ed9d1f0f3090faafdd562149/adbc_driver_manager-1.13.0-cp314-cp314t-win_arm64.whl", hash = "sha256:914e2dbb42d31763af97b472e23b99b5888681e8485d8931a776a4662dfae049", size = 934897, upload-time = "2026-10-26T06:32:41.345Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/60/b3d4c3680736f14e16f3511ee9306aad55349ee7d716b30e92e7205ca42f/adbc_driver_manager-1.13.0-cp315-cp315-macosx_10_15_x86_64.whl", hash = "sha256:6c34be6fb94c81614ae2eafbf984428657cc8d694ee73503aa5c74f88a44e776", size = 583902, upload-time = "2026-10-26T06:32:46.957Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/f0/3e5f67764da561a6f4389eb2a79d41bf3b3486361c47982fe0e50d0b39b2/adbc_driver_manager-1.13.0-cp315-cp315-macosx_11_0_arm64.whl", hash = "sha256:cad5bfa4f930c737cb2505c3888e091fa64bc2d628a3e2aadef307e5d50d47f7", size = 597158, upload-time = "2026-10-26T06:32:48.852Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/52/d488a47c4c489019c042f5622ed1f5fe798a96bd1db4e67c6dde1e326b5e/adbc_driver_manager-1.13.0-cp315-cp315-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:68fcb9e8b12bb18171b775e389fea8228b315b344d7b9454a9c350e1cd17e28d", size = 4122336, upload-time = "2026-10-26T06:32:51.611Z" },
+    { url = "https://files.pythonhosted.org/packages/39/61/5a1b64bb95d8712a1818e1e3fc67415ec8f930f7daa1f9f61c663f0b5bab/adbc_driver_manager-1.13.0-cp315-cp315-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fbb20b36d7dd23913e3bebd4b37499f4130c38a291150ba57205c25531782775", size = 4194847, upload-time = "2026-10-26T06:32:53.998Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/12/5601ebe623182360d0fede83b85d5fd3ec1cc1436f8bc566586d6984e0a3/adbc_driver_manager-1.13.0-cp315-cp315-win_amd64.whl", hash = "sha256:d961fc26536092500ef9f2333d1113e8954a67fcffb08148296b0238d35b4206", size = 762591, upload-time = "2026-10-26T06:33:06.227Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/10/4de47851ff5be7e20d590a89d667ad9a45709f70d2d95652835b9253b922/adbc_driver_manager-1.13.0-cp315-cp315-win_arm64.whl", hash = "sha256:c5c59cb30aaff7bb1e4da95f6d92c4949532233174ba8d59b1b96102facddbfb", size = 921291, upload-time = "2026-10-26T06:33:08.052Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/6b/53eb3b0df2735a7ef4d225589a0a4b59bb81f9b31728c623667dc3e1a234/adbc_driver_manager-1.13.0-cp315-cp315t-macosx_10_15_x86_64.whl", hash = "sha256:1bb5a9787d3cfe88193b5d82bd866c3060c198fea3f36918797f4af80561920d", size = 601116, upload-time = "2026-10-26T06:32:55.66Z" },
+    { url = "https://files.pythonhosted.org/packages/69/c8/4e91dc6dcf38c44e406efc47546e956e1d804a813de81d0a66626b89de3c/adbc_driver_manager-1.13.0-cp315-cp315t-macosx_11_0_arm64.whl", hash = "sha256:20231b8c38fef43719e3fc901a16f7dcf1cebe5869618242b31dca44879b78fd", size = 613341, upload-time = "2026-10-26T06:32:57.042Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/53/42a5738a5b23fd6629eb24e3410914b336c1e381858c88b7fb51bb1b0737/adbc_driver_manager-1.13.0-cp315-cp315t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:bd1d240663870aa4bf15efb4c789d8a71faa8a81fa8ee704975b0bfb2cad4f1a", size = 4189350, upload-time = "2026-10-26T06:32:59.066Z" },
+    { url = "https://files.pythonhosted.org/packages/44/3e/081d2cd91b69ee3ff81a37c2a1036a2a7956586c8d784760d793892e7303/adbc_driver_manager-1.13.0-cp315-cp315t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f5e85accd23f8665ba5381bbb99d655fa3728f4e998e1f3c8821b8f1b5476211", size = 4243900, upload-time = "2026-10-26T06:33:01.332Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/ab/3a9377a8b7a649f06a97d0c657dfbf0c6bd7550cd608991ef7f7a7456895/adbc_driver_manager-1.13.0-cp315-cp315t-win_amd64.whl", hash = "sha256:424a902361f0ad8833437a726407f91c849173aa8dcf4b04de5a72602293bf30", size = 777474, upload-time = "2026-10-26T06:33:02.754Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/1b/f152c3f58106370cd50ac6993109d0b265e93ce90b644d99c47e734d5e69/adbc_driver_manager-1.13.0-cp315-cp315t-win_arm64.whl", hash = "sha256:7b25f59a849b53391e22af1fd2a83d7ca36e171a89f52c88a240445764b3d694", size = 932449, upload-time = "2026-10-26T06:33:04.483Z" },
 ]
 
 [[package]]
@@ -206,15 +222,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/a1/43/3a5e81d1728f4d234c79bfe385808ee7c04834f7c37a4b5c257459c25614/duckdb-1.5.5-cp314-cp314-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fbf0f2d48b43c6c304d00463b463c27ead6c4b01c3c1816b750f728decf71afe", size = 21513851, upload-time = "2026-07-22T10:55:07.864Z" },
     { url = "https://files.pythonhosted.org/packages/91/41/fc7c829172c60ca22485251eab285f4f1a0d87b486a024c726f21471d86e/duckdb-1.5.5-cp314-cp314-win_amd64.whl", hash = "sha256:9dc826c4b50e64f6c4e4d07a3a9cb075ef70ba3899dc43ec5493dc3d7b04b353", size = 13691858, upload-time = "2026-07-22T10:55:11.181Z" },
     { url = "https://files.pythonhosted.org/packages/e1/2c/95d9216b79e9273689d7ebce125a54503ed0c9bd7da931f0265888e99779/duckdb-1.5.5-cp314-cp314-win_arm64.whl", hash = "sha256:63e48d4b74b15aeacd688976432a7225163df8c226eddeb8536bba2d4d4ff433", size = 14470180, upload-time = "2026-07-22T10:55:14.445Z" },
-]
-
-[[package]]
-name = "importlib-resources"
-version = "7.1.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e4/06/b56dfa750b44e86157093bc8fca0ab81dccbf5260510de4eaf1cb69b5b99/importlib_resources-7.1.0.tar.gz", hash = "sha256:0722d4c6212489c530f2a145a34c0a7a3b4721bc96a15fada5930e2a0b760708", size = 44985, upload-time = "2026-04-12T16:36:09.232Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8a/db/55a262f3606bebcae07cc14095338471ad7c0bbcaa37707e6f0ee49725b7/importlib_resources-7.1.0-py3-none-any.whl", hash = "sha256:1bd7b48b4088eddb2cd16382150bb515af0bd2c70128194392725f82ad2c96a1", size = 37232, upload-time = "2026-04-12T16:36:08.219Z" },
 ]
 
 [[package]]
@@ -304,31 +311,45 @@ wheels = [
 
 [[package]]
 name = "pyarrow"
-version = "25.0.1"
+version = "26.0.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3d/e3/27f57f80141379d60defe6703eb50a707325706f07fedfd1312c7a751995/pyarrow-25.0.1.tar.gz", hash = "sha256:9150a83248bfed9813ea3c3af74c3856c1984d444aa28e58bf7733b9750ddf6a", size = 1201653, upload-time = "2026-08-10T12:40:53.904Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ec/34/17c34cb38e5d940e38f0f0d9fdfa0e8a506676409ea9b85aff7e3079f831/pyarrow-26.0.0.tar.gz", hash = "sha256:0cccd36e00ea3afeb52ded61f2721ce71f604853d70c45365c58324eb773d6ae", size = 1239433, upload-time = "2026-10-09T08:26:25.315Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/8d/8f271a7a034c834910ec925d56fa4b29733b1380f5289419f5aaa3b02777/pyarrow-25.0.1-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:c7c534ec03c358a76ea3e505e74c1b6aef290af90c444dfd092dbfe23e755b85", size = 35855328, upload-time = "2026-08-10T12:38:45.489Z" },
-    { url = "https://files.pythonhosted.org/packages/d2/cd/5bac242f4e841b9971d5eb94fdfe2577e2b70be983e27401e72055786037/pyarrow-25.0.1-cp313-cp313-macosx_12_0_x86_64.whl", hash = "sha256:dda9470024204d7bbf2042b47c6e8a0e47a3eeb8e34405882dfaea6577e0c153", size = 37622415, upload-time = "2026-08-10T12:38:51.107Z" },
-    { url = "https://files.pythonhosted.org/packages/63/1f/96d03b4e1506524f7087adb0fd6b2f69f0c9c7aaff1ec36d8030082e15a5/pyarrow-25.0.1-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:44a9120ce5bd81936b8ab9a88076e3fd47c2c6838e0e43630fed83626aca81d9", size = 46813813, upload-time = "2026-08-10T12:38:57.773Z" },
-    { url = "https://files.pythonhosted.org/packages/98/d6/33a411115b61dbfc16ad6ad73e71730f6fea654ee3667673bc53ab0e2fe7/pyarrow-25.0.1-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:0befcf816e45a1af33ac775a9970b749e4868a230c7372f0ae5e932bee27039f", size = 50104452, upload-time = "2026-08-10T12:39:04.579Z" },
-    { url = "https://files.pythonhosted.org/packages/33/ae/b1b97c9ca87f9f9ddbb5230c798df94eccce61bd79b9b45458c69a478588/pyarrow-25.0.1-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:3f89685964f46e4216103c75483aac0c0692a5f72212d7ca835adba5ede56ce3", size = 49951343, upload-time = "2026-08-10T12:39:11.8Z" },
-    { url = "https://files.pythonhosted.org/packages/98/9e/a112df5cfd5a68cb1d9fc31cfe38c28d5aec9f10865ce37ecef2e4450873/pyarrow-25.0.1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:6943e2fe7954d29d84de45d29d34c8dc36ce96570e67d89aa9976e650a4a9138", size = 53144784, upload-time = "2026-08-10T12:39:20.503Z" },
-    { url = "https://files.pythonhosted.org/packages/31/24/97e8bd98f1e3b07e2ba08bcdff690674fbe16d69a7d2712cc3884665e615/pyarrow-25.0.1-cp313-cp313-win_amd64.whl", hash = "sha256:31e49a7888fcdf3a835da33ae777f6bb9a866334e5a789282fc26dcf426f7f15", size = 27870159, upload-time = "2026-08-10T12:39:26.161Z" },
-    { url = "https://files.pythonhosted.org/packages/36/4c/b525824ad3094076919273cd97db61fb3d78252dee76fa3b8dc8f76774aa/pyarrow-25.0.1-cp314-cp314-macosx_12_0_arm64.whl", hash = "sha256:bf0b672390cdcb640d7288f96b826d71ff4e9abb254a86c89890baf51a29cee6", size = 35885255, upload-time = "2026-08-10T12:39:32.366Z" },
-    { url = "https://files.pythonhosted.org/packages/08/62/448bb0e940de41aec31d1a956e63ad9c54afdf122a103cc3ab20c2a3ce33/pyarrow-25.0.1-cp314-cp314-macosx_12_0_x86_64.whl", hash = "sha256:38a9a4b4b9613380e200641891495a56c3d5a98a092db4a870af9975e220471d", size = 37644461, upload-time = "2026-08-10T12:39:38.142Z" },
-    { url = "https://files.pythonhosted.org/packages/6e/9a/13587e38bd4806fd218f50fd13b8903fab60588a699ff0c406372e5b4043/pyarrow-25.0.1-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:0b726ad7e7b669be982b0c71c07fe4b037d654354130da79a7902a669e93a66b", size = 46877146, upload-time = "2026-08-10T12:39:43.722Z" },
-    { url = "https://files.pythonhosted.org/packages/8d/61/1c5d1229fa21da4cff5365e41e57177aaac57c563c727f35419b8513d1c1/pyarrow-25.0.1-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:9171748cdf796972d85a4b60157c279913e242992e350c90c7450182a9838b2a", size = 50131616, upload-time = "2026-08-10T12:39:49.304Z" },
-    { url = "https://files.pythonhosted.org/packages/43/20/291e1d65cc0b09aa19f03cf25cf51a2f5fa94b5db315178f2d254ed5cad4/pyarrow-25.0.1-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:b7a296aac7a71fa0886c08e155ddb6c636a50013f801f6178daafa0f9e726188", size = 50008879, upload-time = "2026-08-10T12:39:56.891Z" },
-    { url = "https://files.pythonhosted.org/packages/8b/7c/1b7c9ec28e76576337e4f97b31141c9a181b89b6d1d6221e9d8205621a58/pyarrow-25.0.1-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:0fe7c8b6c03969b49c8c66182e4a18e3819ab92d07cfab5d8370c531b9369ef0", size = 53170864, upload-time = "2026-08-10T12:40:04.918Z" },
-    { url = "https://files.pythonhosted.org/packages/b7/75/f3d789dc06011a765d14d86bda799cf72ac1d715b6a6edecaa0d73d95062/pyarrow-25.0.1-cp314-cp314-win_amd64.whl", hash = "sha256:f729cfdbd36fd99d543b67a914d2de044c84ebe45be8b34902b299b608c15c8f", size = 28620729, upload-time = "2026-08-10T12:40:51.41Z" },
-    { url = "https://files.pythonhosted.org/packages/fc/05/647a8ee6f7c2662feb6921315617bc04dcd6034763fb61b1199720bf6162/pyarrow-25.0.1-cp314-cp314t-macosx_12_0_arm64.whl", hash = "sha256:59a2de54c0cbd954da861eee4d1d330f8e909c45b53455baef696380f2c55033", size = 36130288, upload-time = "2026-08-10T12:40:11.014Z" },
-    { url = "https://files.pythonhosted.org/packages/93/f8/c9ee997554d7bea94520667dd1933f109ac1da3ee3556d2b49381e023484/pyarrow-25.0.1-cp314-cp314t-macosx_12_0_x86_64.whl", hash = "sha256:35935cd5de130aa5cf4dea052a63e6bf2e17006c35c3a468194242b9b2bf5956", size = 37762187, upload-time = "2026-08-10T12:40:16.592Z" },
-    { url = "https://files.pythonhosted.org/packages/a2/08/a28c01c7fe9e96e8233ce2d13df1d402f4f999f848f51d2daacd6bb4c036/pyarrow-25.0.1-cp314-cp314t-manylinux_2_28_aarch64.whl", hash = "sha256:f3831aaa25c67a99f99dc8b05873cb9d64560390372e2aa197ce9dd4a3f06a44", size = 46888003, upload-time = "2026-08-10T12:40:23.242Z" },
-    { url = "https://files.pythonhosted.org/packages/1b/b9/58612e977d28dc58c878448866838369ee8da2f1e7cc8ed2c84b952aafee/pyarrow-25.0.1-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:6a1fdfc6659b6b19022f2e50627fb5cf7156a66c46bf4299379955cbe742382a", size = 50079036, upload-time = "2026-08-10T12:40:29.169Z" },
-    { url = "https://files.pythonhosted.org/packages/72/13/66e1402dcc860e1dc2760b1e0292c9a569b62b3bccab69def1b3e907d006/pyarrow-25.0.1-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:169d3429d5be7c752125890620f75a60776d38b0035eddae939651640822332e", size = 50040226, upload-time = "2026-08-10T12:40:35.186Z" },
-    { url = "https://files.pythonhosted.org/packages/78/10/3f1a5497a7ef732ab0f03ecca3e66d89d9c0f57fdc61b4794c456b781f01/pyarrow-25.0.1-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:119297a6dc197e45d9c6d4415f7814a67ffa36c180d26f68c154c58067ae782d", size = 53149035, upload-time = "2026-08-10T12:40:41.454Z" },
-    { url = "https://files.pythonhosted.org/packages/93/c0/37d4a7e8e2f7a6076283673d5298018ca26478b934c6ee369e10505ab32c/pyarrow-25.0.1-cp314-cp314t-win_amd64.whl", hash = "sha256:4288f27577352d608ca08553b0865e4a9b3aa14820c5d95b53337218d609835b", size = 28753071, upload-time = "2026-08-10T12:40:46.623Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/35/ca95493712af97c46a312945c8e9d16b21c5fe2f148be5466168d0290505/pyarrow-26.0.0-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:a6ca849f90cf73fe361f08a5762c783ead9671e4548c1f558cc637b54c9103f2", size = 36336700, upload-time = "2026-10-09T08:14:51.399Z" },
+    { url = "https://files.pythonhosted.org/packages/69/ef/b1a675f79c9babfd4fcd99af62141d3c2d1a78a524e311b0c6b80110445a/pyarrow-26.0.0-cp313-cp313-macosx_12_0_x86_64.whl", hash = "sha256:c2ba350957076b1b3a22f549261dc3e9c67ca20816d8bd5f79d7b9c69be4c4c2", size = 38698502, upload-time = "2026-10-09T08:14:57.114Z" },
+    { url = "https://files.pythonhosted.org/packages/3b/7c/cea852a832a327a8de797b3a68e5c25ce0f5aa1d20503807671bd90ec642/pyarrow-26.0.0-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:e3b190ba1d3d22a5a8758597f797111b77d433473744352a184a5ee0a42d672e", size = 50865064, upload-time = "2026-10-09T08:20:01.614Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/d6/e95834b29360092376fe4da9956ba41bb7b021869efe6ee9d4172d05cb15/pyarrow-26.0.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:240bd18a7487f8767616a948a69dd4e740a8bc36a1c9da49e4dc9a32c5c2faed", size = 53926722, upload-time = "2026-10-09T08:23:10.829Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/7f/98257444e2aea2e1fddceee3af3bd2077236d550428413f80393bd1f888d/pyarrow-26.0.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:2b5fcd69c0e1107b79e55839877db5a6ed04651b73fd6fec581d09e230bed5e4", size = 54443093, upload-time = "2026-10-09T08:23:16.971Z" },
+    { url = "https://files.pythonhosted.org/packages/88/ca/dac99cfb25cfa62bf7194600cc99abc14a6bd2af50d7fdb7f15eeaf6e202/pyarrow-26.0.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:f7444ea6975c49a857c68f9bd8fa11acae96dede63d120ffb3bf0a603ea82516", size = 57381937, upload-time = "2026-10-09T08:23:24.95Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/ed/138d29fddaf803b90f4527e124bb6aaddc18aaf4a6c50fd0a5f577c94989/pyarrow-26.0.0-cp313-cp313-win_amd64.whl", hash = "sha256:3de30a7432b48b98b9decbd9e25a53bb9251d202c2e6c5a29a50869592ccb117", size = 28478571, upload-time = "2026-10-09T08:23:30.535Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/32/01858422a37f083911c2bb4d15cc32c5eeaa9d9b2bf5ddedee995a7146a6/pyarrow-26.0.0-cp314-cp314-macosx_12_0_arm64.whl", hash = "sha256:5780d487ff6c6ed7b42298609680d87fe0036e529a9dc2e1105364bce9697f50", size = 36378402, upload-time = "2026-10-09T08:23:36.537Z" },
+    { url = "https://files.pythonhosted.org/packages/00/85/f6b5976c2878b752d0804d371684e0495a71de296b6dc6559e6fbaa4311a/pyarrow-26.0.0-cp314-cp314-macosx_12_0_x86_64.whl", hash = "sha256:a0e4e92eeb088f1d7c2c04d6c7de8434c75abb4b4ccf0bbcd045aa7164c68d93", size = 38733074, upload-time = "2026-10-09T08:23:42.873Z" },
+    { url = "https://files.pythonhosted.org/packages/81/bc/c90fcbbcf893631e23dab1b0fb3fa29a508a8614326571b03c0894eda00b/pyarrow-26.0.0-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:eaf9e7cc7ab59f6c760232bbde18f64d559bbc50544841303bfb32be53533297", size = 50929201, upload-time = "2026-10-09T08:23:50.507Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/c1/0c1ff38ab7df1b2cf54cf0ad9f19a516c4e416c6c9b4c966cc2c9d587f77/pyarrow-26.0.0-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:ab6914db225d7f399652ae1f08588dfbc9efe617612715701e3d9d5cfa5ca19f", size = 53951865, upload-time = "2026-10-09T08:23:57.692Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/70/6a6b170496925472adad45a32528770fc8632db35fc60d4edd1e9ce1be0b/pyarrow-26.0.0-cp314-cp314-musllinux_1_2_aarch64.whl", hash = "sha256:41dd3661ef40790a78870052ad7a58ad827b27c67a4511f06962eb9e9b74d19b", size = 54496388, upload-time = "2026-10-09T08:24:05.23Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/32/033ef9dba80976820190e292a10a5a23e9406572b76bbeb4d685d90e5c8d/pyarrow-26.0.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:6e949744dcfc2d379808f7013c5f9cafaf0f817656dff7d46c6931528dd1784b", size = 57411588, upload-time = "2026-10-09T08:24:12.043Z" },
+    { url = "https://files.pythonhosted.org/packages/1e/ff/a74892c50aaf1f9f744a84493e08a2f99221e77c39d2d4a926de21a99edf/pyarrow-26.0.0-cp314-cp314-win_amd64.whl", hash = "sha256:4a5fa8dc70dd50808990ff36faf44088e357b353d86c7682dd92d4b78d4c97d5", size = 29237858, upload-time = "2026-10-09T08:24:58.106Z" },
+    { url = "https://files.pythonhosted.org/packages/03/10/f0ee0976ef08a851a743c57608917ac9a47623f688b9ee0efe5429975ba1/pyarrow-26.0.0-cp314-cp314t-macosx_12_0_arm64.whl", hash = "sha256:e2a1856e9565fe2679863b372478c681806aebbf7d0a6e72f33e77f804e647d6", size = 36495870, upload-time = "2026-10-09T08:24:16.479Z" },
+    { url = "https://files.pythonhosted.org/packages/27/ca/0bc431a509bf10b4472dbb94f4184752ecbbddeb7f467152dac0fdaed469/pyarrow-26.0.0-cp314-cp314t-macosx_12_0_x86_64.whl", hash = "sha256:4bcba83299cb2b8f8e443d36c6ba6269a5034431879015fb0719495df8a14de2", size = 38819754, upload-time = "2026-10-09T08:24:20.875Z" },
+    { url = "https://files.pythonhosted.org/packages/61/59/2be41d26af7a07fb71581fb753cae396403ba1a2978355fd553929d44a9a/pyarrow-26.0.0-cp314-cp314t-manylinux_2_28_aarch64.whl", hash = "sha256:3a4d235876f14b4136b4d616ec42eb469ea0d6ead336cae631aa1dd29b21c962", size = 50933671, upload-time = "2026-10-09T08:24:27.199Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/cb/b6d5048cf3178be9678f5c9c60040199894b2f69c3439c87ced91fd24da9/pyarrow-26.0.0-cp314-cp314t-manylinux_2_28_x86_64.whl", hash = "sha256:210cc9b83888b87cdc8f793eebb264f22b20d0dedbedefc73b9687a7047b4747", size = 53906419, upload-time = "2026-10-09T08:24:33.536Z" },
+    { url = "https://files.pythonhosted.org/packages/09/2b/23e30fbd776c81d18d134d2592eb60daca13e8a57ab087d0fa042f9d9f3d/pyarrow-26.0.0-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:ca77c43ca55bfc9a4eeb1f0cd5f093f08731b77c24cdba0829035f084959b0bb", size = 54527960, upload-time = "2026-10-09T08:24:41.292Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/23/fce251cd6b0546dfc181b00d5c8ef1c95a8c4cae83266bc3dfd5f719c62c/pyarrow-26.0.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:290a74c48e9491b436fd5edacfadf357943f82aa45c81110bd83a69aab33d1cf", size = 57388010, upload-time = "2026-10-09T08:24:48.186Z" },
+    { url = "https://files.pythonhosted.org/packages/44/a5/0126fb0ef8d59bf257bdd68bb41623b72afc6e81790a0b4ac863a0f58861/pyarrow-26.0.0-cp314-cp314t-win_amd64.whl", hash = "sha256:515a10dae2a1d236bc9c9209d0317acb6746ea63cd4f98704904af7156d90ed1", size = 29406123, upload-time = "2026-10-09T08:24:53.387Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/66/8ada1b5165359d84b4b9b5384742304d1081da670f77d458fd9c9b8a2161/pyarrow-26.0.0-cp315-cp315-macosx_12_0_arm64.whl", hash = "sha256:e890816e5ee89c74a0f8b9379fe8b5ba83f46132b2a0bbb9b1c21359ec30dfda", size = 36373215, upload-time = "2026-10-09T08:25:03.067Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/83/74f10c3d803a6834b2acab21847724d4bdbc74d246eb17321432844707f3/pyarrow-26.0.0-cp315-cp315-macosx_12_0_x86_64.whl", hash = "sha256:9db18a9dc0af52135c9eac549d80a7a882696efbe5406cf882b044525d4ecc2e", size = 38730866, upload-time = "2026-10-09T08:25:07.924Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/5a/ea2fa2163b1bd8ff73efd39c4060be63fd6ddec03e7887a471acd1e042a4/pyarrow-26.0.0-cp315-cp315-manylinux_2_28_aarch64.whl", hash = "sha256:734312d3d99088d9ec28c5b17bad40389bd8373a1afc10acb60b83fd217af087", size = 50924443, upload-time = "2026-10-09T08:25:13.864Z" },
+    { url = "https://files.pythonhosted.org/packages/78/80/8c47b6cf8cfd42826df65193eff026c1cc81fa6cb213a3c3f5d203e6f67a/pyarrow-26.0.0-cp315-cp315-manylinux_2_28_x86_64.whl", hash = "sha256:24f892fdf1ae1942d69d3f7742e2f49960ec95277cfb1a70b8a1d91f4a96d935", size = 53948540, upload-time = "2026-10-09T08:25:19.305Z" },
+    { url = "https://files.pythonhosted.org/packages/69/1f/3a506a76d944ec5c5e4b7f01d8d0446b392a6fb384de627a12e503f616b4/pyarrow-26.0.0-cp315-cp315-musllinux_1_2_aarch64.whl", hash = "sha256:879331ddea2a26479fa18fade71e6facf684a6cf19f67daec3775c871569e8e5", size = 54494863, upload-time = "2026-10-09T08:25:24.517Z" },
+    { url = "https://files.pythonhosted.org/packages/3d/50/08c4bb04d651788d2eaca78065743f4f6ded974d4ef96ae3c473993e9d0c/pyarrow-26.0.0-cp315-cp315-musllinux_1_2_x86_64.whl", hash = "sha256:5b827650e874f1f9f9392524ea3e9e3e8a245de5ba64acca1f81ab188090afb9", size = 57409877, upload-time = "2026-10-09T08:25:31.157Z" },
+    { url = "https://files.pythonhosted.org/packages/d4/f3/c64781fbd7b6d3c07993b698c14944d0d195f07e800fa931c486ae6ab36a/pyarrow-26.0.0-cp315-cp315-win_amd64.whl", hash = "sha256:8e8e28c464552b5ca03e30d4504168c4425ce383884f8611b00e972f9fd933fc", size = 29236658, upload-time = "2026-10-09T08:26:22.607Z" },
+    { url = "https://files.pythonhosted.org/packages/06/55/2ee3729daea999f19f061f03898d4895a242c4cd94f26e1324e5fdfbfe10/pyarrow-26.0.0-cp315-cp315t-macosx_12_0_arm64.whl", hash = "sha256:ce28748cbeb0f29c3ce9603782979c7117580fc76f16aa3ca448b38a22281adb", size = 36489011, upload-time = "2026-10-09T08:25:37.64Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/7d/3eb17f601f2bf13eda5f2ed28956379ca628b4dda97619cbb1cb1721622d/pyarrow-26.0.0-cp315-cp315t-macosx_12_0_x86_64.whl", hash = "sha256:106bb9290fc6fd9a84138a9440038ef184bac86463543c5ff099229cb30d996c", size = 38808480, upload-time = "2026-10-09T08:25:43.579Z" },
+    { url = "https://files.pythonhosted.org/packages/0e/e3/f0047360b0f4bfc031b256dc0aec3837a61f245b2fb70f8363438e2db665/pyarrow-26.0.0-cp315-cp315t-manylinux_2_28_aarch64.whl", hash = "sha256:2e4a413046eba9896e632925066c74095182200ba32e19ff0166bf64d2f936ac", size = 50923273, upload-time = "2026-10-09T08:25:51.445Z" },
+    { url = "https://files.pythonhosted.org/packages/38/d9/56d9fb91210407df31cbeb9b91138601c88c7c8fb5f6bf773b20d65509bf/pyarrow-26.0.0-cp315-cp315t-manylinux_2_28_x86_64.whl", hash = "sha256:d58798c4d8d629700058e9afc1e16b9801023f3ce4dc1c92d945e79b5ffe4e98", size = 53900905, upload-time = "2026-10-09T08:25:59.554Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/40/8e8a7e9e027c731520c7eb179dd00a153b76ebf0bc11d213c6c8f8502851/pyarrow-26.0.0-cp315-cp315t-musllinux_1_2_aarch64.whl", hash = "sha256:645917e976671debabf854abab6e2b75c571ca4f82adc33a2d338697f7c27d93", size = 54518345, upload-time = "2026-10-09T08:26:07.125Z" },
+    { url = "https://files.pythonhosted.org/packages/be/89/1e768a3fdb88d34e708ad2dc00dbf8e4e30290784eb84198d59308963bea/pyarrow-26.0.0-cp315-cp315t-musllinux_1_2_x86_64.whl", hash = "sha256:7c3fda041e7078802589cf257750323ee3d0cd1e56e53a9b20ec845697fb3d28", size = 57379403, upload-time = "2026-10-09T08:26:13.624Z" },
+    { url = "https://files.pythonhosted.org/packages/96/be/7b81a44d6a8e70581dcc1d6f01541f9000a973b1e5d75394aec91e7b179a/pyarrow-26.0.0-cp315-cp315t-win_amd64.whl", hash = "sha256:68cd662e9e2b00876a131950cf32336ace2d0865e1f9418763e3d3be8481dfa4", size = 29389953, upload-time = "2026-10-09T08:26:18.277Z" },
 ]
 
 [[package]]

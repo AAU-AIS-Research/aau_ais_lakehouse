@@ -1,13 +1,13 @@
 from functools import cache
 from urllib import parse
 
-from adbc_driver_gizmosql import dbapi
-from adbc_driver_gizmosql.dbapi import Connection
+from adbc_driver_hardcharger import dbapi
+from adbc_driver_hardcharger.dbapi import Connection
 from pydantic import BaseModel, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class GizmoSqlConnectionSettings(BaseModel):
+class HardchargerConnectionSettings(BaseModel):
     host: str
     port: int = 3306
     user: str
@@ -19,8 +19,8 @@ class GizmoSqlConnectionSettings(BaseModel):
 
     @property
     def uri(self):
-        scheme = "grpc+tls" if self.use_tls else "grpc"
-        return f"{scheme}://{self.host}:{self.port}"
+        tls = "true" if self.use_tls else "false"
+        return f"hardcharger://{self.host}:{self.port}?tls={tls}"
 
     @property
     def db_kwargs(self):

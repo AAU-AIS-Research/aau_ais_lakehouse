@@ -15,7 +15,7 @@ def create(ctx: AISContext):
     settings = ctx.obj
 
     with (
-        settings.gizmosql.connect(autocommit=True) as con,
+        settings.hardcharger.connect(autocommit=True) as con,
         con.cursor() as cur,
     ):
         files = (
@@ -39,7 +39,7 @@ def drop(ctx: AISContext):
     """[red]Drops[/red] the schema :litter_in_bin_sign:"""
     settings = ctx.obj
     with (
-        settings.gizmosql.connect(autocommit=True) as con,
+        settings.hardcharger.connect(autocommit=True) as con,
         con.cursor() as cur,
     ):
         typer.confirm(
@@ -65,7 +65,7 @@ def compress(ctx: AISContext):
     """Compresses the lakehouse schema by merging small files"""
     settings = ctx.obj
     with (
-        settings.gizmosql.connect(autocommit=True) as con,
+        settings.hardcharger.connect(autocommit=True) as con,
         con.cursor() as cur,
     ):
         q = (
