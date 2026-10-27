@@ -197,7 +197,15 @@ set end_ts = to_timestamp($1),
 where load_id = $2;"""
         with self.__con.cursor() as curs:
             epoch = time.time()
-            curs.execute(q, parameters=[epoch, self.load_id]).fetchall()
+            curs.execute(
+                q,
+                parameters=[
+                    epoch,
+                    self.load_id,
+                    self.__ctx.start_ingest_datetime,
+                    self.__ctx.stop_ingest_datetime,
+                ],
+            ).fetchall()
             self.__con.commit()
         logger.info(
             "Load %s stopped in %.2fs!",
@@ -231,7 +239,15 @@ where load_id = $2"""
             epoch = time.time()
 
             logger.info("Wrapping up load dimension")
-            curs.execute(q, parameters=[epoch, self.load_id]).fetchall()
+            curs.execute(
+                q,
+                parameters=[
+                    epoch,
+                    self.load_id,
+                    self.__ctx.start_ingest_datetime,
+                    self.__ctx.stop_ingest_datetime,
+                ],
+            ).fetchall()
             self.__con.commit()
 
     def __enter__(self):
