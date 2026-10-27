@@ -1,8 +1,8 @@
 --------------------------------------------------------------------------------------
 --#region Staging Tables
 --------------------------------------------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS staging;
-CREATE TABLE IF NOT EXISTS staging.cross_day_gap (
+CREATE SCHEMA IF NOT EXISTS lakehouse.staging;
+CREATE TABLE IF NOT EXISTS lakehouse.staging.cross_day_gap (
     mmsi                UINTEGER                NOT NULL,
     imo                 UINTEGER,
     transponder_type    TEXT                    NOT NULL,
@@ -15,8 +15,7 @@ CREATE TABLE IF NOT EXISTS staging.cross_day_gap (
     type                TEXT                    NOT NULL,
     state_change        TEXT                    NOT NULL,
     start_point         GEOMETRY('EPSG:4326')   NOT NULL,
-    end_point           GEOMETRY('EPSG:4326')   NOT NULL,
-    PRIMARY KEY (mmsi, start_date_id, start_time_id, end_date_id, end_time_id)
+    end_point           GEOMETRY('EPSG:4326')   NOT NULL
 );
 
 --------------------------------------------------------------------------------------
