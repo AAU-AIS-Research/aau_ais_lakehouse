@@ -166,7 +166,6 @@ def __load_fact(dst_con: Connection, src: Table, load_id: int) -> None:
             db_schema_name="fact",
             mode="append",
         )
-        dst_con.commit()
 
 
 def load(src_id: str, dst_con: Connection, tbl: Table):
