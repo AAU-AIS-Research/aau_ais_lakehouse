@@ -1,5 +1,7 @@
+import datetime
 import logging
 import time
+from datetime import datetime as Datetime
 
 from adbc_driver_manager.dbapi import Connection
 
@@ -8,12 +10,18 @@ from aau_ais_schema.exceptions import LoadError
 logger = logging.getLogger(__name__)
 
 
-class _LoadContext:
+class IngestionContext:
     def __init__(self, con: Connection, id: int, src_id: str, dst_tbl: str) -> None:
         self.__con = con
         self.__id = id
         self.__src_id = src_id
         self.__dst_tbl = dst_tbl
+        self.__start_ingest_datetime: Datetime | None = None
+        self.__stop_ingest_datetime: Datetime | None = None
+
+    @property
+    def connection(self) -> Connection:
+        return self.__con
 
     @property
     def id(self) -> int:
@@ -23,33 +31,53 @@ class _LoadContext:
     def src_id(self) -> str:
         return self.__src_id
 
+    @property
+    def start_ingest_datetime(self) -> Datetime | None:
+        return self.__start_ingest_datetime
+
+    @property
+    def stop_ingest_datetime(self) -> Datetime | None:
+        return self.__stop_ingest_datetime
+
+    @property
+    def completed(self) -> bool:
+        return (
+            self.start_ingest_datetime is not None
+            and self.stop_ingest_datetime is not None
+        )
+
     def ingest_started(self):
-        q = """--sql
-update dim.load_dim
-set ingest_start_ts = to_timestamp(?)
-where load_id = ?;
-"""
-        with self.__con.cursor() as curs:
-            epoch = time.time()
-            curs.execute(q, parameters=[epoch, self.id]).fetchall()
+        self.__start_ingest_datetime = Datetime.now(datetime.UTC)
+
+    #         q = """--sql
+    # update dim.load_dim
+    # set ingest_start_ts = to_timestamp(?)
+    # where load_id = ?;
+    # """
+    #         with self.__con.cursor() as curs:
+    #             epoch = time.time()
+    #             curs.execute(q, parameters=[epoch, self.id]).fetchall()
 
     def ingest_stopped(self):
-        q = f"""--sql
-update dim.load_dim
-set ingest_end_ts = to_timestamp(?),
-    ingest_duration = to_timestamp(?)::timestamp - ingest_start_ts,
-    ingest_per_sec = (
-        select count(*) / epoch(to_timestamp(?)::timestamp - ingest_start_ts)
-        from {self.__dst_tbl}
-        where load_id = ?
-    )
-where load_id = ?;
-"""
-        with self.__con.cursor() as curs:
-            epoch = time.time()
-            curs.execute(
-                q, parameters=[epoch, epoch, epoch, self.id, self.id]
-            ).fetchall()
+        self.__stop_ingest_datetime = Datetime.now(datetime.UTC)
+
+
+#         q = f"""--sql
+# update dim.load_dim
+# set ingest_end_ts = to_timestamp(?),
+#     ingest_duration = to_timestamp(?)::timestamp - ingest_start_ts,
+#     ingest_per_sec = (
+#         select count(*) / epoch(to_timestamp(?)::timestamp - ingest_start_ts)
+#         from {self.__dst_tbl}
+#         where load_id = ?
+#     )
+# where load_id = ?;
+# """
+#         with self.__con.cursor() as curs:
+#             epoch = time.time()
+#             curs.execute(
+#                 q, parameters=[epoch, epoch, epoch, self.id, self.id]
+#             ).fetchall()
 
 
 class LoadContext:
@@ -59,6 +87,7 @@ class LoadContext:
         self.__load_id = -1
         self.__con = con
         self.__start_time = None
+        self.__ctx: IngestionContext | None = None
 
     @property
     def load_id(self) -> int:
@@ -124,7 +153,7 @@ returning load_id;
             ).fetchall()
             return result[0][0]
 
-    def start(self) -> _LoadContext:
+    def start(self) -> IngestionContext:
         logger.info("Starting load...")
         self.__start_time = time.perf_counter()
 
@@ -137,27 +166,38 @@ returning load_id;
         except Exception as e:
             self.__roleback()
             raise e
-
-        return _LoadContext(self.__con, self.load_id, self.__src_id, self.__dst_tbl)
+        self.__ctx = IngestionContext(
+            self.__con, self.load_id, self.__src_id, self.__dst_tbl
+        )
+        return self.__ctx
 
     def stop(self):
         logger.info("Stopping load...")
+        if self.__ctx is None:
+            raise ValueError("Context never started")
+        if not self.__ctx.completed:
+            raise RuntimeError(
+                "Ingestion is either not started, stopped or both! Remember to call ingest_started() and ingest_stopped"
+            )
+
         q = f"""--sql
 update dim.load_dim
-set end_ts = to_timestamp(?),
-    total_duration = to_timestamp(?)::timestamp - start_ts,
+set end_ts = to_timestamp($1),
+    total_duration = to_timestamp($1)::timestamp - start_ts,
     no_rows = (
         select count(*)
         from {self.__dst_tbl}
-        where load_id = ?
+        where load_id = $2
     ),
-    failed = false
-where load_id = ?;"""
+    failed = false,
+    ingest_start_ts = $3,
+    ingest_end_ts = $4,
+    ingest_duration = ingest_end_ts - ingest_start_ts,
+    ingest_per_sec = if(epoch(ingest_duration) = 0, no_rows, no_rows / epoch(ingest_duration)) 
+where load_id = $2;"""
         with self.__con.cursor() as curs:
             epoch = time.time()
-            curs.execute(
-                q, parameters=[epoch, epoch, self.load_id, self.load_id]
-            ).fetchall()
+            curs.execute(q, parameters=[epoch, self.load_id]).fetchall()
             self.__con.commit()
         logger.info(
             "Load %s stopped in %.2fs!",
@@ -166,17 +206,23 @@ where load_id = ?;"""
         )
 
     def fail(self):
+        if self.__ctx is None:
+            raise ValueError("Context never started")
         q = f"""--sql
 update dim.load_dim
-set end_ts = to_timestamp(?),
-    total_duration = to_timestamp(?)::timestamp - start_ts,
+set end_ts = to_timestamp($1),
+    total_duration = to_timestamp($1)::timestamp - start_ts,
     no_rows = (
         select count(*)
         from {self.__dst_tbl}
-        where load_id = ?
+        where load_id = $2
     ),
-    failed = true
-where load_id = ?;"""
+    failed = true,
+    ingest_start_ts = $3,
+    ingest_end_ts = $4,
+    ingest_duration = ingest_end_ts - ingest_start_ts,
+    ingest_per_sec = if(epoch(ingest_duration) = 0, no_rows, no_rows / epoch(ingest_duration)) 
+where load_id = $2"""
         with self.__con.cursor() as curs:
             logger.error("Load failed, performing roleback")
             self.__roleback()
@@ -185,9 +231,7 @@ where load_id = ?;"""
             epoch = time.time()
 
             logger.info("Wrapping up load dimension")
-            curs.execute(
-                q, parameters=[epoch, epoch, self.load_id, self.load_id]
-            ).fetchall()
+            curs.execute(q, parameters=[epoch, self.load_id]).fetchall()
             self.__con.commit()
 
     def __enter__(self):

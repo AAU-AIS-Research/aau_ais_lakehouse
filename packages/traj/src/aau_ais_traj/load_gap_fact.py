@@ -3,7 +3,7 @@ import logging
 import duckdb
 import pyarrow as pa
 import pyarrow.compute as pc
-from aau_ais_schema import LoadContext
+from aau_ais_schema import IngestionContext, LoadContext
 from aau_ais_schema.dim import (
     DateDim,
     DateIdExpander,
@@ -168,45 +168,44 @@ def __load_fact(dst_con: Connection, src: Table, load_id: int) -> None:
         )
 
 
-def load(src_id: str, dst_con: Connection, tbl: Table):
-    with LoadContext(src_id, "lakehouse.fact.ais_gap_fact", dst_con) as ctx:
-        start_tbl_length = len(tbl)
-        tbl = __append_src(dst_con, tbl, ctx.id)
+def load(ctx: IngestionContext, tbl: Table):
+    start_tbl_length = len(tbl)
+    tbl = __append_src(ctx.connection, tbl, ctx.id)
 
-        ctx.ingest_started()
+    ctx.ingest_started()
 
-        # Date Dimension
-        date_dim = DateDim(dst_con, pre_processors=[DateIdExpander()])
-        date_dim.load(tbl, name_map={"date_id": "start_date_id"})
-        date_dim.load(tbl, name_map={"date_id": "end_date_id"})
+    # Date Dimension
+    date_dim = DateDim(ctx.connection, pre_processors=[DateIdExpander()])
+    date_dim.load(tbl, name_map={"date_id": "start_date_id"})
+    date_dim.load(tbl, name_map={"date_id": "end_date_id"})
 
-        # Time Dimension
-        time_dim = TimeDim(dst_con, pre_processors=[TimeIdExpander()])
-        time_dim.load(tbl, name_map={"time_id": "start_time_id"})
-        time_dim.load(tbl, name_map={"time_id": "end_time_id"})
+    # Time Dimension
+    time_dim = TimeDim(ctx.connection, pre_processors=[TimeIdExpander()])
+    time_dim.load(tbl, name_map={"time_id": "start_time_id"})
+    time_dim.load(tbl, name_map={"time_id": "end_time_id"})
 
-        tbl = __join_traj_keys(dst_con, tbl)
-        tbl = TransponderTypeDim(dst_con).load(tbl)
-        tbl = VesselTypeDim(dst_con).load(tbl)
-        tbl = TrajStateChangeDim(dst_con).load(tbl)  # what if midnight
-        tbl = GapTypeDim(dst_con, pre_processors=[__gap_type_preprocessor]).load(
-            tbl, name_map={"short_name": "gap_type"}
-        )
+    tbl = __join_traj_keys(ctx.connection, tbl)
+    tbl = TransponderTypeDim(ctx.connection).load(tbl)
+    tbl = VesselTypeDim(ctx.connection).load(tbl)
+    tbl = TrajStateChangeDim(ctx.connection).load(tbl)  # what if midnight
+    tbl = GapTypeDim(ctx.connection, pre_processors=[__gap_type_preprocessor]).load(
+        tbl, name_map={"short_name": "gap_type"}
+    )
 
-        # Set the default "empty" gap_imp_id in the source data
-        gap_imp_id = dst_con.execute(
-            "select gap_imp_id from ais.dim.gap_imp_mv_dim where method_name = 'empty'"
-        ).fetchall()[0][0]
-        tbl = tbl.append_column(
-            "gap_imp_id", pa.array([gap_imp_id] * len(tbl), type=pa.int32())
-        )
+    # Set the default "empty" gap_imp_id in the source data
+    gap_imp_id = ctx.connection.execute(
+        "select gap_imp_id from ais.dim.gap_imp_mv_dim where method_name = 'empty'"
+    ).fetchall()[0][0]
+    tbl = tbl.append_column(
+        "gap_imp_id", pa.array([gap_imp_id] * len(tbl), type=pa.int32())
+    )
 
-        assert len(tbl) - start_tbl_length == 0, (
-            f"Source length: {start_tbl_length} is not equal to table length after processing: {len(tbl)}"
-        )
-        logger.info("Committing dimension table ingest")
-        dst_con.commit()
-        logger.info("Dimension ingestion committed")
+    assert len(tbl) - start_tbl_length == 0, (
+        f"Source length: {start_tbl_length} is not equal to table length after processing: {len(tbl)}"
+    )
+    logger.info("Committing dimension table ingest")
+    ctx.connection.commit()
+    logger.info("Dimension ingestion committed")
 
-        __load_fact(dst_con, tbl, ctx.id)
-        ctx.ingest_stopped()
+    __load_fact(ctx.connection, tbl, ctx.id)
+    ctx.ingest_stopped()
