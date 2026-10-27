@@ -155,7 +155,7 @@ with load_stats as (
         count(*)                                                                    as no_rows,
         $3                                                                          as ingest_start_ts,
         $4                                                                          as ingest_end_ts,
-        ingest_end_ts - ingest_start_ts                                             as ingest_duration
+        ingest_end_ts - ingest_start_ts                                             as ingest_duration,
         if(epoch(ingest_duration) = 0, no_rows, no_rows / epoch(ingest_duration))   as ingest_per_sec
     from {self.__dst_tbl}
     where load_id = $2
