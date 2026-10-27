@@ -2,6 +2,8 @@
 DROP TABLE IF EXISTS ais.dim.gap_type_dim;
 DROP TABLE IF EXISTS ais.dim.gap_imp_mv_dim;
 DROP TABLE IF EXISTS lakehouse.fact.ais_gap_fact;
+DROP TABLE IF EXISTS lakehouse.staging.cross_day_gap;
+DROP SCHEMA IF EXISTS lakehouse.staging;
 
 -- now safe to drop the sequences
 DROP SEQUENCE IF EXISTS ais.dim.gap_type_dim_seq;
