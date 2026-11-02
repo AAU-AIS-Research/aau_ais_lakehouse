@@ -65,7 +65,7 @@ cells as (
         -- Geodesic area on the WGS84 spheroid. PROJ treats EPSG:4326 in lat,lon
         -- axis order, so flip the SRID-less lon/lat geometry before measuring;
         -- without the flip, tiles with |lon| > 90 yield NaN.
-        ST_Area_Spheroid(ST_FlipCoordinates(ST_MakeEnvelope(lon_min, lat_min, lon_max, lat_max))) as area
+        ST_Area_Spheroid(ST_FlipCoordinates(geom)) as area
     from bounds
 )
 select
