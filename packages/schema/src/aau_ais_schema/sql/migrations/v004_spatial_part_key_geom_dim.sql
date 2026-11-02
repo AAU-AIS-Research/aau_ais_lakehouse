@@ -21,7 +21,7 @@ COMMENT ON COLUMN dim.spatial_part_key_geom_dim.level is 'Quadkey zoom level, eq
 COMMENT ON COLUMN dim.spatial_part_key_geom_dim.x is 'Tile column at the partition depth';
 COMMENT ON COLUMN dim.spatial_part_key_geom_dim.y is 'Tile row at the partition depth';
 COMMENT ON COLUMN dim.spatial_part_key_geom_dim.geom is 'Partition cell envelope in EPSG:4326';
-COMMENT ON COLUMN dim.spatial_part_key_geom_dim.area is 'Cell area in square meters (spherical approximation, R = 6378137 m)';
+COMMENT ON COLUMN dim.spatial_part_key_geom_dim.area is 'Cell area in square meters (geodesic, WGS84 spheroid)';
 COMMENT ON COLUMN dim.spatial_part_key_geom_dim.centroid is 'Cell centroid in EPSG:4326';
 --#endregion
 --------------------------------------------------------------------------------------

@@ -62,12 +62,10 @@ cells as (
         x,
         y,
         ST_MakeEnvelope(lon_min, lat_min, lon_max, lat_max) as geom,
-        -- Spherical rectangle area (R = WGS84 semi-major axis), computed from the
-        -- bounds directly: CRS transforms treat EPSG:4326 in lat,lon axis order,
-        -- which yields NaN for tiles with |lon| > 90 or touching the poles.
-        6378137.0 * 6378137.0
-            * radians(lon_max - lon_min)
-            * (sin(radians(lat_max)) - sin(radians(lat_min))) as area
+        -- Geodesic area on the WGS84 spheroid. PROJ treats EPSG:4326 in lat,lon
+        -- axis order, so flip the SRID-less lon/lat geometry before measuring;
+        -- without the flip, tiles with |lon| > 90 yield NaN.
+        ST_Area_Spheroid(ST_FlipCoordinates(ST_MakeEnvelope(lon_min, lat_min, lon_max, lat_max))) as area
     from bounds
 )
 select
