@@ -71,8 +71,8 @@ select
     x,
     y,
     geom,
-    ST_Area(ST_Transform(geom, 'EPSG:4326', 'EPSG:3857')) as area,
-    ST_Centroid(geom)                                     as centroid
+    ST_Area_Spheroid(geom)  as area,
+    ST_Centroid(geom)       as centroid
 from cells;
 """
         with duckdb_utils.get_spatial_con().begin() as con:
