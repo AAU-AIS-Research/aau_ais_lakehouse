@@ -11,6 +11,10 @@ from .destination_dim import DestinationDim
 from .gap_type_dim import GapTypeDim
 from .nav_status_dim import NavStatusDim
 from .pos_type_dim import PosTypeDim
+from .spatial_part_key_geom_dim import (
+    SpatialPartKeyGeomDim,
+    SpatialPartKeyGeomFieldExpander,
+)
 from .stop_geom_dim import StopGeomDim, StopGeomFieldExpander
 from .time_dim import TimeDim, TimeIdExpander
 from .traj_geom_dim import TrajCustFieldExpander, TrajGeomDim

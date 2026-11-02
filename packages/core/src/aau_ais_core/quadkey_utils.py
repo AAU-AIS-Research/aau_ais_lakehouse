@@ -1,5 +1,9 @@
 import math
 
+# Default quadkey depth of the spatial_part_key used for partitioning
+# ais_point_fact. Fits in the uinteger (32 bit) spatial_part_key column.
+DEFAULT_PARTITION_DEPTH = 8
+
 
 def get_zxy(lon: float, lat: float, zoom: int) -> tuple[int, int, int]:
     """
@@ -65,11 +69,13 @@ def int_to_quadkey(value: int, zoom: int) -> str:
     return qkey
 
 
-def compute_qkey_range(qkey: str, partition_depth: int = 8) -> tuple[int, int]:
+def compute_qkey_range(
+    qkey: str, partition_depth: int = DEFAULT_PARTITION_DEPTH
+) -> tuple[int, int]:
     qkey_depth = len(qkey)
 
     if qkey_depth >= partition_depth:
-        part_key = quadkey_to_int(qkey[0:8])
+        part_key = quadkey_to_int(qkey[0:partition_depth])
         return (part_key, part_key)
 
     diff = partition_depth - qkey_depth

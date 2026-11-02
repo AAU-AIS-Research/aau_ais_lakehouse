@@ -42,7 +42,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "adbc-driver-hardcharger", specifier = "==2.0.*" },
+    { name = "adbc-driver-hardcharger", specifier = "==2.1.*" },
     { name = "duckdb", specifier = "==1.5.*" },
     { name = "pyarrow", specifier = ">=22.0.0" },
     { name = "pydantic-settings", specifier = "==2.*" },
@@ -56,7 +56,7 @@ dev = [
 
 [[package]]
 name = "aau-ais-schema"
-version = "1.2.2"
+version = "1.3.0"
 source = { editable = "../schema" }
 dependencies = [
     { name = "aau-ais-core" },
@@ -120,18 +120,18 @@ wheels = [
 
 [[package]]
 name = "adbc-driver-hardcharger"
-version = "2.0.2"
+version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "adbc-driver-manager" },
     { name = "pyarrow" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c3/76/0ca926bc54ba9f8329b36df3ba3a37e3c346f4f441792e5c151a322b8f14/adbc_driver_hardcharger-2.0.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:3f2a7a962f22f163c15092d1631ed805ca506a9e6f2e951237c03a0ade25b9b4", size = 9707835, upload-time = "2026-10-22T17:40:42.093Z" },
-    { url = "https://files.pythonhosted.org/packages/07/ff/7b255a9d2e2b1055caedffc905372f7138ca1186c0712c19967ef2f478dc/adbc_driver_hardcharger-2.0.2-py3-none-macosx_11_0_x86_64.whl", hash = "sha256:24016e4393d1119cd2de5c92c039568b69594cb3d3d528ada5be345040a2e891", size = 10984322, upload-time = "2026-10-22T17:40:44.651Z" },
-    { url = "https://files.pythonhosted.org/packages/7f/cf/b85d31d9bbf4e294eb472ff96f7583109acc4928f9cb0e7abc73600e6445/adbc_driver_hardcharger-2.0.2-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:f82647c9f8af17909fac53544ad8d0a9300620af3cfe2d870e6f3e56b962b5fa", size = 12013569, upload-time = "2026-10-22T17:40:47.292Z" },
-    { url = "https://files.pythonhosted.org/packages/7e/33/8cc96431ab91d63bc24c4a8869b2f4ffc0607c4434e3cba1bb761a3b0818/adbc_driver_hardcharger-2.0.2-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:c1e2336d72094f066c6b0171c0c8f903a863237bdde77fcd1e9967976dc66e3b", size = 10664206, upload-time = "2026-10-22T17:40:49.672Z" },
-    { url = "https://files.pythonhosted.org/packages/c8/68/95462ec3e44889e1c84a6848fb82cc7904c6b83a4596d22444a8b2cc22e6/adbc_driver_hardcharger-2.0.2-py3-none-win_amd64.whl", hash = "sha256:0be881ede95526879eecefa62f047ca533aa78349616b1952c92a82ae2a57636", size = 11160137, upload-time = "2026-10-22T17:40:52.629Z" },
+    { url = "https://files.pythonhosted.org/packages/99/62/20e4d461495ed740345f395eb1fe99888d9436d7113d6e4380ed59d59ffb/adbc_driver_hardcharger-2.1.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:24fa78b4d92401cb4a678ad190bf320304d54489dd967df8b5e02f6d7a02ec93", size = 9712127, upload-time = "2026-10-29T10:05:19.713Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/4a/c821d2a2d254611b1752235e6ac1fb98002dffa78c86c2e9200924672504/adbc_driver_hardcharger-2.1.0-py3-none-macosx_11_0_x86_64.whl", hash = "sha256:f372fa25375a11c6b1a20238b14dea41c04934ebf339ac7e5fa69c6398b4d13b", size = 10990087, upload-time = "2026-10-29T10:05:22.768Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/5b/e22696abf8c4b239ce36607433ff11293a6a52e4f57baca9d628b49288e3/adbc_driver_hardcharger-2.1.0-py3-none-manylinux1_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:d1a3d888d0b6ff707845d2b8af6f1537cff9b112bcbbe4d9453854d5bee73a44", size = 12017502, upload-time = "2026-10-29T10:05:25.576Z" },
+    { url = "https://files.pythonhosted.org/packages/b1/1d/e0893cb59000a032ffe81432e753cc9493e49622426640c6c01ae1de8d10/adbc_driver_hardcharger-2.1.0-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:f192ba9998d661fb02f1e6c7596a7e9c7f050ed6d795c5eefc43863c4bbfffae", size = 10667864, upload-time = "2026-10-29T10:05:28.874Z" },
+    { url = "https://files.pythonhosted.org/packages/11/53/f1e3dd12a615b44f6e3226bfbd4d7f18a2d4dae7135ef37cebe2c2381b66/adbc_driver_hardcharger-2.1.0-py3-none-win_amd64.whl", hash = "sha256:1f8b0365bb3cd21ae8fe00da069b6568d8f0b3a3c1b6b9e046fdc718c80217a4", size = 11165088, upload-time = "2026-10-29T10:05:32.225Z" },
 ]
 
 [[package]]
