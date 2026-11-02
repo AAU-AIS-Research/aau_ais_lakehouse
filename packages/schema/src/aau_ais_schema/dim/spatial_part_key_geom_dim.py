@@ -61,7 +61,13 @@ cells as (
         level,
         x,
         y,
-        ST_MakeEnvelope(lon_min, lat_min, lon_max, lat_max) as geom
+        ST_MakeEnvelope(lon_min, lat_min, lon_max, lat_max) as geom,
+        -- Spherical rectangle area (R = WGS84 semi-major axis), computed from the
+        -- bounds directly: CRS transforms treat EPSG:4326 in lat,lon axis order,
+        -- which yields NaN for tiles with |lon| > 90 or touching the poles.
+        6378137.0 * 6378137.0
+            * radians(lon_max - lon_min)
+            * (sin(radians(lat_max)) - sin(radians(lat_min))) as area
     from bounds
 )
 select
@@ -71,8 +77,8 @@ select
     x,
     y,
     geom,
-    ST_Area_Spheroid(geom)  as area,
-    ST_Centroid(geom)       as centroid
+    area,
+    ST_Centroid(geom) as centroid
 from cells;
 """
         with duckdb_utils.get_spatial_con().begin() as con:
