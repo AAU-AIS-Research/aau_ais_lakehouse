@@ -1,8 +1,10 @@
+import math
+
 import duckdb
 import pytest
 from duckdb import DuckDBPyConnection
 
-from aau_ais_core import duckdb_macros
+from aau_ais_core import duckdb_macros, quadkey_utils
 
 
 @pytest.fixture
@@ -17,6 +19,7 @@ def con():
     duckdb_macros.create_gchain_trim_key(con)
     duckdb_macros.create_int_to_quadkey(con)
     duckdb_macros.create_quadkey_to_zxy(con)
+    duckdb_macros.create_int_to_quadkey_envelope(con)
 
     return con
 
@@ -248,3 +251,71 @@ def test_quadkey_to_zxy(
         assert len(result) == 3
 
         assert result == expected
+
+
+@pytest.mark.parametrize(
+    "int_key,lvl,expected",
+    [
+        (0, 1, (-180.0, 0.0, 0.0, 85.05112877980659)),
+        (1, 1, (0.0, 0.0, 180.0, 85.05112877980659)),
+        (2, 1, (-180.0, -85.05112877980659, 0.0, 0.0)),
+        (3, 1, (0.0, -85.05112877980659, 180.0, 0.0)),
+        (6, 2, (0.0, 0.0, 90.0, 66.51326044311186)),
+    ],
+)
+def test_int_to_quadkey_envelope(
+    con: DuckDBPyConnection,
+    int_key: int,
+    lvl: int,
+    expected: tuple[float, float, float, float],
+):
+    with con:
+        rows = con.query(
+            """
+            select ST_GeometryType(g), ST_XMin(g), ST_YMin(g), ST_XMax(g), ST_YMax(g)
+            from (select int_to_quadkey_envelope(?, ?) as g)
+            """,
+            params=[int_key, lvl],
+        ).fetchall()
+
+        assert len(rows) == 1
+        geom_type, x_min, y_min, x_max, y_max = rows[0]
+
+        assert geom_type == "POLYGON"
+        assert (x_min, y_min, x_max, y_max) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "lon,lat,lvl",
+    [
+        (10.4, 57.7, 8),
+        (-122.3, 47.6, 5),
+        (0.0, 0.0, 3),
+        (179.9, -80.0, 10),
+    ],
+)
+def test_int_to_quadkey_envelope_matches_tile_bounds(
+    con: DuckDBPyConnection, lon: float, lat: float, lvl: int
+):
+    z, x, y = quadkey_utils.get_zxy(lon, lat, lvl)
+    int_key = quadkey_utils.quadkey_to_int(quadkey_utils.zxy_to_quadkey(z, x, y))
+
+    n = 2.0**lvl
+    expected = (
+        x / n * 360.0 - 180.0,
+        math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * (y + 1) / n)))),
+        (x + 1) / n * 360.0 - 180.0,
+        math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / n)))),
+    )
+
+    with con:
+        rows = con.query(
+            """
+            select ST_XMin(g), ST_YMin(g), ST_XMax(g), ST_YMax(g)
+            from (select int_to_quadkey_envelope(?, ?) as g)
+            """,
+            params=[int_key, lvl],
+        ).fetchall()
+
+        assert len(rows) == 1
+        assert rows[0] == pytest.approx(expected)

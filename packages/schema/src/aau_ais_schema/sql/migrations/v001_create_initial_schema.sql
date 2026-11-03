@@ -100,6 +100,27 @@ create or replace macro int_to_quadkey(val, z) as (
     ) t
 );
 
+-- Envelope (POLYGON) of the tile cell in EPSG:4326 lon/lat for an int-encoded
+-- quadkey at depth z (leading '0' digits are lost in the int, so z is required)
+create or replace macro int_to_quadkey_envelope(val, z) as (
+    with input as (
+        select right(val::bit::varchar, z * 2) as bitstring
+    ), tile as (
+        -- each quadkey digit is a 2-bit pair: low bit -> x, high bit -> y
+        select
+            sum(substr(bitstring, pos + 1, 1)::int * pow(2, z - (pos + 1) // 2))::bigint as x,
+            sum(substr(bitstring, pos, 1)::int * pow(2, z - (pos + 1) // 2))::bigint as y
+        from input, generate_series(1, length(bitstring), 2) as gs(pos)
+    )
+    select ST_MakeEnvelope(
+        x / pow(2, z) * 360.0 - 180.0,
+        degrees(atan(sinh(pi() * (1 - 2.0 * (y + 1) / pow(2, z))))),
+        (x + 1) / pow(2, z) * 360.0 - 180.0,
+        degrees(atan(sinh(pi() * (1 - 2.0 * y / pow(2, z)))))
+    )
+    from tile
+);
+
 create or replace macro coord_to_quadrant(lon, lat) as (
     select case
         when lon >= 0 and lat >= 0 then 1

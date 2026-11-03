@@ -9,6 +9,7 @@ from .__grid import (
 )
 from .__quadkey import (
     create_int_to_quadkey,
+    create_int_to_quadkey_envelope,
     create_quadkey_bit_encode,
     create_quadkey_int16_encode,
     create_quadkey_int32_encode,

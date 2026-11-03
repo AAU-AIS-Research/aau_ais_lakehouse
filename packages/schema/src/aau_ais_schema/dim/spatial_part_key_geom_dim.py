@@ -36,37 +36,11 @@ with tiles as (
         int_to_quadkey(b.{spk}, {depth})          as quadkey,
         t.z::utinyint                             as level,
         t.x::uinteger                             as x,
-        t.y::uinteger                             as y
+        t.y::uinteger                             as y,
+        int_to_quadkey_envelope(b.{spk}, {depth}) as geom
     from batch b, lateral (
         select z, x, y from quadkey_to_zxy(int_to_quadkey(b.{spk}, {depth}))
     ) as t
-),
-bounds as (
-    select
-        spatial_part_key,
-        quadkey,
-        level,
-        x,
-        y,
-        x / pow(2, level) * 360.0 - 180.0                                as lon_min,
-        (x + 1) / pow(2, level) * 360.0 - 180.0                          as lon_max,
-        degrees(atan(sinh(pi() * (1 - 2.0 * (y + 1) / pow(2, level)))))  as lat_min,
-        degrees(atan(sinh(pi() * (1 - 2.0 * y / pow(2, level)))))        as lat_max
-    from tiles
-),
-cells as (
-    select
-        spatial_part_key,
-        quadkey,
-        level,
-        x,
-        y,
-        ST_MakeEnvelope(lon_min, lat_min, lon_max, lat_max) as geom,
-        -- Geodesic area on the WGS84 spheroid. PROJ treats EPSG:4326 in lat,lon
-        -- axis order, so flip the SRID-less lon/lat geometry before measuring;
-        -- without the flip, tiles with |lon| > 90 yield NaN.
-        ST_Area_Spheroid(ST_FlipCoordinates(geom)) as area
-    from bounds
 )
 select
     spatial_part_key,
@@ -75,13 +49,17 @@ select
     x,
     y,
     geom,
-    area,
+    -- Geodesic area on the WGS84 spheroid. PROJ treats EPSG:4326 in lat,lon
+    -- axis order, so flip the SRID-less lon/lat geometry before measuring;
+    -- without the flip, tiles with |lon| > 90 yield NaN.
+    ST_Area_Spheroid(ST_FlipCoordinates(geom)) as area,
     ST_Centroid(geom) as centroid
-from cells;
+from tiles;
 """
         with duckdb_utils.get_spatial_con().begin() as con:
             duckdb_macros.create_int_to_quadkey(con)
             duckdb_macros.create_quadkey_to_zxy(con)
+            duckdb_macros.create_int_to_quadkey_envelope(con)
             return con.query(q).to_arrow_table()
 
 

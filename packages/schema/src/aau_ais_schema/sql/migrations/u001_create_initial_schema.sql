@@ -62,6 +62,7 @@ DROP MACRO IF EXISTS quadkey_int32_encode;
 DROP MACRO IF EXISTS quadkey_int64_encode;
 DROP MACRO IF EXISTS quadkey_to_zxy;
 DROP MACRO IF EXISTS int_to_quadkey;
+DROP MACRO IF EXISTS int_to_quadkey_envelope;
 DROP MACRO IF EXISTS coord_to_quadrant;
 DROP MACRO IF EXISTS coord_to_grid_id;
 DROP MACRO IF EXISTS wgs84_coord_to_grid_id;
