@@ -71,6 +71,7 @@ DROP MACRO IF EXISTS grid_id_to_wgs84_coord;
 DROP MACRO IF EXISTS grid_id_to_wgs84_envelope;
 DROP MACRO IF EXISTS datetime_keys_to_timestamp;
 DROP MACRO IF EXISTS ts_to_temporal_part_key;
+DROP MACRO IF EXISTS hdg_id_to_geom;
 --#endregion
 
 --#region Schemas  (last; empty now)

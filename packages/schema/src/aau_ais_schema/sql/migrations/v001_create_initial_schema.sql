@@ -230,6 +230,15 @@ create or replace macro datetime_keys_to_timestamp(date_id, time_id) as (
 create or replace macro ts_to_temporal_part_key(ts) as
     year(ts) * 100 + month(ts);
 comment on macro ts_to_temporal_part_key is 'Converts a timestamp to a temporal partitioning key';
+
+create or replace macro hdg_id_to_geom(hdg_id) as (
+  select st_setcrs(st_makeenvelope(x, y, x + 0.5, y + 0.5), 'epsg:4326') as geom
+  from (
+    select 
+      (hdg_id % 100000 % 360) * 0.5 + case floor(hdg_id / 100000) when 1 then 0 when 2 then -180 when 3 then -180 else 0 end    as x,
+      floor(hdg_id % 100000 / 360) * 0.5 + case floor(hdg_id / 100000) when 1 then 0 when 2 then 0 when 3 then -90 else -90 end as y
+  )
+);
 --#endregion
 --------------------------------------------------------------------------------------
 --#region Dimensions
