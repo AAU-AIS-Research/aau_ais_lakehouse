@@ -534,7 +534,7 @@ create table if not exists lakehouse.fact.ais_point_fact (
 )
     partitioned by (spatial_part_key, temporal_part_key) 
     sorted by (qkey);
-alter table tbl set (target_file_size = '128MB');
+alter table lakehouse.fact.ais_point_fact set (target_file_size = '128MB');
 
 -- AIS trajectory fact
 create table if not exists lakehouse.fact.ais_traj_fact(
