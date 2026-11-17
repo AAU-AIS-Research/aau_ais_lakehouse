@@ -3,7 +3,7 @@ import logging
 import duckdb
 import pyarrow as pa
 import pyarrow.compute as pc
-from aau_ais_schema import IngestionContext, LoadContext
+from aau_ais_schema import IngestionContext
 from aau_ais_schema.dim import (
     DateDim,
     DateIdExpander,
@@ -107,7 +107,7 @@ def __get_traj_keys(dst_con: Connection, src: Table):
 
 
 def __join_traj_keys(dst_con: Connection, tbl: Table) -> Table:
-    traj_table = __get_traj_keys(dst_con, tbl)
+    traj_table = __get_traj_keys(dst_con, tbl)  # noqa: F841 - Used in the query below
     q = """
 select *
 from tbl
