@@ -489,10 +489,7 @@ create table if not exists dim.stop_geom_dim(
 --------------------------------------------------------------------------------------
 
 -- AIS point fact
-create table if not exists lakehouse.fact.ais_point_fact
-    partitioned by (spatial_part_key, temporal_part_key) 
-    sorted by (qkey) 
-(
+create table if not exists lakehouse.fact.ais_point_fact (
     ais_point_id        ubigint     not null,
     prev_ais_point_id   ubigint,
     temporal_part_key   uinteger    not null,
@@ -534,7 +531,9 @@ create table if not exists lakehouse.fact.ais_point_fact
     delta_cog_heading   numeric(10,1),
     delta_draught       numeric(10,1),
     delta_destination   boolean
-);
+)
+    partitioned by (spatial_part_key, temporal_part_key) 
+    sorted by (qkey);
 alter table tbl set (target_file_size = '128MB');
 
 -- AIS trajectory fact

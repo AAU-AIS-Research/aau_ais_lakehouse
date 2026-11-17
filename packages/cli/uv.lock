@@ -56,7 +56,7 @@ dev = [
 
 [[package]]
 name = "aau-ais-schema"
-version = "1.4.1"
+version = "1.4.2"
 source = { editable = "../schema" }
 dependencies = [
     { name = "aau-ais-core" },
