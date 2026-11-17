@@ -436,7 +436,7 @@ insert or ignore into dim.traj_type_dim(traj_type) values
 create sequence if not exists dim.traj_state_change_dim_state_change_id_seq start with 1 maxvalue 65_535;
 create table if not exists dim.traj_state_change_dim(
     state_change_id usmallint   primary key default nextval('dim.traj_state_change_dim_state_change_id_seq'),
-    state_change    varchar(10) not null unique
+    state_change    varchar(15) not null unique
 );
 insert or ignore into dim.traj_state_change_dim(state_change) values
     ('unknown'),
@@ -489,7 +489,10 @@ create table if not exists dim.stop_geom_dim(
 --------------------------------------------------------------------------------------
 
 -- AIS point fact
-create table if not exists lakehouse.fact.ais_point_fact(
+create table if not exists lakehouse.fact.ais_point_fact
+    partitioned by (spatial_part_key, temporal_part_key) 
+    sorted by (qkey) 
+(
     ais_point_id        ubigint     not null,
     prev_ais_point_id   ubigint,
     temporal_part_key   uinteger    not null,
@@ -532,8 +535,7 @@ create table if not exists lakehouse.fact.ais_point_fact(
     delta_draught       numeric(10,1),
     delta_destination   boolean
 );
-
-alter table lakehouse.fact.ais_point_fact set partitioned by (spatial_part_key, temporal_part_key);
+alter table tbl set (target_file_size = '128MB');
 
 -- AIS trajectory fact
 create table if not exists lakehouse.fact.ais_traj_fact(
@@ -589,7 +591,7 @@ create table if not exists lakehouse.fact.ais_traj_fact(
     dist_sec_prev_obj       uinteger
 );
 comment on column lakehouse.fact.ais_traj_fact.dist_meter_prev_obj is
-    'distance in seconds to the previous object for the vessel, think imputation';
+    'distance in meters to the previous object for the vessel, think imputation';
 comment on column lakehouse.fact.ais_traj_fact.dist_sec_prev_obj is
     'distance in seconds to the previous object for the vessel, think imputation';
 
