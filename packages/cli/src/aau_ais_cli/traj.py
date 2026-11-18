@@ -1,6 +1,7 @@
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Annotated, Callable
+from typing import Annotated
 
 from aau_ais_schema import LoadContext
 from aau_ais_traj import load_stop_fact, load_traj_fact, utils
@@ -46,7 +47,7 @@ def load(
     settings = ctx.obj
 
     for f in traj_file:
-        with settings.gizmosql.connect() as con:
+        with settings.hardcharger.connect() as con:
             print(f"Processing {f}...")
             if not utils.is_traj_file(f):
                 print(f"[yellow]Skipping {f} as it is not compatible[/yellow]")
